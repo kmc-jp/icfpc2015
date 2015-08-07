@@ -160,7 +160,7 @@ function isValidLocation(unit) {
 	return true;
 }
 function nextUnit() {
-	if (++unitId >= units.length) return false;
+	if (++unitId >= sources[seedId].length) return false;
 
 	nowUnit = $.extend(true, {}, units[sources[seedId][unitId]]);
 
@@ -221,8 +221,8 @@ function rotate(r) {
 	for (var i = 0, l = ret.members.length; i < l; ++i) {
 		var x = ret.members[i].x, y = ret.members[i].y;
 
-		x -= px, y -= py;
 		x -= y / 2 | 0;
+		x -= px - (py / 2 | 0), y -= py;
 		if (r == 1) {
 			var nx = -y, ny = x+y;
 			x = nx, y = ny;
@@ -231,8 +231,8 @@ function rotate(r) {
 			var nx = x+y, ny = -x;
 			x = nx, y = ny;
 		}
+		x += px - (py / 2 | 0), y += py;
 		x += y / 2 | 0;
-		x += px, y += py;
 
 		ret.members[i].x = x;
 		ret.members[i].y = y;
@@ -346,6 +346,9 @@ function initTable() {
 	}
 }
 
+function initNext() {
+}
+
 function moveRec(d) {
 	var sidx = $("#record").prop("selectedIndex");
 	if (0 <= sidx+d && sidx+d < $("#record option").length) {
@@ -356,6 +359,8 @@ function moveRec(d) {
 $(function() {
 	initTable();
 	initField($("#display"), +$("#W").val(), +$("#H").val());
+
+	initNext();
 
 	$("#btn_prev, #btn_next").css("display", "none"); //
 

@@ -38,6 +38,7 @@ input[type=text]:hover {
 #display {
 	margin-top: 5px;
 	margin-bottom: 15px;
+	margin-right: 30px;
 }
 #display td > div {
 	margin: 0; padding: 0;
@@ -82,4 +83,14 @@ input[type=text]:hover {
 
 #form_command {
 	display: inline;
+}
+
+#next {
+	overflow-y: hidden;
+	height: 300px;
+	width: 200px;
+	border: 1px solid rgb(140, 140, 140);
+}
+#next ul {
+	list-style: none;
 }
