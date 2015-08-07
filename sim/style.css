@@ -100,10 +100,16 @@ input[type=text]:hover {
 }
 
 #next {
-	overflow-y: hidden;
-	height: 300px;
-	width: 200px;
+	overflow-y: scroll;
+	height: 400px;
 	border: 1px solid rgb(140, 140, 140);
+}
+#next table td > div {
+    height: 40px;
+    overflow: visible;
+}
+#next table td > div > div {
+    position: relative;
 }
 #next ul {
 	list-style: none;
