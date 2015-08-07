@@ -109,4 +109,15 @@ inline bool operator==(Unit lhs, Unit rhs) {
   return lhs.mem == rhs.mem && lhs.pivot == rhs.pivot;
 }
 
+inline bool operator<(Unit lhs, Unit rhs) {
+  sort(begin(lhs.mem),end(lhs.mem));
+  sort(begin(rhs.mem),end(rhs.mem));
+  return (lhs.mem == rhs.mem) ? lhs.pivot == rhs.pivot : lhs.mem < rhs.mem;
+}
+
 table lock(table &b, const Unit &u);
+
+Unit centerize(int w, Unit u);
+
+using res_p = tuple<Unit, int>;
+set<res_p> movable_poses(const table &b, const Unit &u);
