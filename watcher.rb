@@ -11,6 +11,7 @@ mylog = j["data"]["settings"].
       n["rankings"].select{|r| r["team"] == "KMC"}[0]
     }
 if log != mylog then
+updated = false
 mylog.each.with_index{|n,i|
         print "#{sprintf("% 3i",i)}| "
         if n.nil?
@@ -22,9 +23,11 @@ mylog.each.with_index{|n,i|
         end
         if log[i] == nil || log[i]["tags"] != mylog[i]["tags"] then
             puts "[new]"
+            updated = true
         else
             puts ""
         end 
+        system('say -v Alex -r 200 "our score is..."') if updated
     }
 log = mylog
 end
