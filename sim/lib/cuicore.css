@@ -1,0 +1,16 @@
+.CUI {
+	margin: 0; padding: 0;
+	cursor: default;
+}
+.CUI tr, .CUI td {
+	margin: 0; padding: 0;
+}
+.CUI td>div {
+	margin: 0; padding: 0;
+	overflow: hidden;
+}
+.CUI td>div>div {
+	font-family: 'Segoe UI';
+	position: relative;
+	top: -300%; left: -100%;
+}

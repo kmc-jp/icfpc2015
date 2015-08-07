@@ -1,0 +1,85 @@
+.CUI {
+	border: 1px solid black;
+}
+
+input {
+	outline: none;
+	border: 1px solid black;
+	background-color: white;
+	border-radius: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    font-size: 13px;
+}
+input[type=button]:hover, input[type=submit]:hover {
+	border: 1px solid rgb(80, 80, 80);
+	background-color: rgb(250, 250, 250);
+	color: rgb(40, 40, 40);
+}
+input[type=text]:hover {
+	border: 1px solid rgb(80, 80, 80);
+}
+#W, #H {
+	width: 30px; height; 20px;
+	text-align: center;
+	border: 0 !important;
+	border-bottom: 1px solid black !important;
+}
+#W:hover, #H:hover {
+	border: 0 !important;
+	border-bottom: 1px solid rgb(80, 80, 80) !important;
+}
+#btn_prev, #btn_next {
+	margin: 5px;
+	width: 50px; height: 20px;
+	text-align: center;
+}
+
+#display {
+	margin-top: 5px;
+	margin-bottom: 15px;
+}
+#display td > div {
+	margin: 0; padding: 0;
+	width: 52px; height: 40px;
+	overflow: hidden;
+}
+#display td > div > div {
+	position: absolute;
+}
+#display td > div > div > div {
+	margin: 0; padding: 0;
+	width: 50px; height: 50px;
+
+	font-size: 10px;
+	text-align: center; line-height: 50px;
+
+	background-image: url('image/cell.png');
+
+	cursor: default;
+}
+#display td > div > div > div:hover {
+	background-image: url('image/cell2.png');
+	color: rgb(30, 30, 30);
+}
+#display .filled > div > div > div {
+	background-image: url('image/cell3.png');
+	color: rgb(255, 255, 255);
+}
+#display .filled > div > div > div:hover {
+	background-image: url('image/cell4.png');
+	color: rgb(225, 225, 225);
+}
+
+#display tr:nth-child(even) > td > div > div > div {
+	position: absolute;
+	top: 0px; left: 26px;
+}
+#display tr:nth-child(odd) > td > div > div > div {
+	position: absolute;
+	top: 0px; left: 0px;
+}
+
+#form_command {
+	display: inline;
+}
