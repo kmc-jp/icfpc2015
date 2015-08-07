@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<HTML lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<link rel="stylesheet" href="lib/jquery/jquery-ui-1.10.4/themes/base/jquery.ui.all.css">
+<link rel="stylesheet" type="text/css" href="lib/style.css">
+<link rel="stylesheet" type="text/css" href="lib/cuicore.css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<!--[if lt IE 7]>
+<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7.js"></script>
+<![endif]-->
+<script type="text/javascript" src="lib/jquery/jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src="lib/jquery/jquery.cookie.js"></script>
+<script type="text/javascript" src="lib/jquery/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="lib/jquery/jquery-ui-1.10.4/ui/minified/jquery-ui.min.js"></script>
+<script type="text/javascript" src="lib/system.js"></script>
+<script type="text/javascript" src="main.js"></script>
+<noscript>
+JavaScriptに対応したブラウザをご使用下さい。
+</noscript>
+</head>
+<body>
+<table cellpadding=0 cellspacing=0 align="center">
+	<tr>
+		<td></td>
+		<td style="text-align: center;"><input type="text" id="W" value="5" class="tb_WH">×<input type="text" id="H" value="10"></td>
+		<td style="text-align: right;"></td>
+	</tr>
+	<tr><td colspan=3 style="text-align: center;">
+		<input type="button" id="btn_recLeft" value="<">
+		<select id="record"></select>
+		<input type="button" id="btn_recRight" value=">">
+	</td></tr>
+	<tr><td colspan=3>
+		<table cellpadding="0" cellspacing="0" id="display"></table>
+	</td></tr>
+	<tr>
+		<td colspan=3 style="text-align: center;">
+			<form onsubmit="return false;" id="form_command">
+				<input type="text" id="command">
+				<input type="submit" id="btn_command" value="Apply">
+			</form>
+		</td>
+	</tr>
+	<tr>
+		<td style="text-align: center;" colspan=3>
+			<input type="button" id="btn_prev" value="←">
+			<input type="button" id="btn_next" value="→">
+		</td>
+	</tr>
+</table>
+</body>
+</HTML>
