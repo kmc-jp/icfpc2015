@@ -26,20 +26,22 @@ var Record = [];
 function min(a, b) { return a > b ? b : a; }
 function max(a, b) { return a > b ? a : b; }
 
-function initField($display, w, h) {
+function initField($display, w, h, isSubTable) {
 	W = w, H = h;
 
-	$("#W").val(W);
-	$("#H").val(H);
+	if (!isSubTable) {
+		$("#W").val(W);
+		$("#H").val(H);
 
-	board = [];
-	for (var y = 0; y < H; ++y) {
-		board[y] = [];
-		for (var x = 0; x < W; ++x) {
-			board[y][x] = false;
+		board = [];
+		for (var y = 0; y < H; ++y) {
+			board[y] = [];
+			for (var x = 0; x < W; ++x) {
+				board[y][x] = false;
+			}
 		}
+		initialBoard = $.extend(true, [], board);
 	}
-	initialBoard = $.extend(true, [], board);
 
 	var $tbody = $("tbody", $display);
 	if ($tbody.length == 0) {
@@ -50,9 +52,9 @@ function initField($display, w, h) {
 		$tbody.children().remove();
 	}
 
-	$cell = [];
+	var $ret = [];
 	for (var y = 0; y < H; ++y) {
-		$cell[y] = [];
+		$ret[y] = [];
 
 		var $tr = $("<tr>");
 		for (var x = 0; x < W; ++x) {
@@ -67,23 +69,27 @@ function initField($display, w, h) {
 			);
 			$tr.append($td);
 
-			$cell[y][x] = $td;
+			$ret[y][x] = $td;
 		}
 		$tbody.append($tr);
 	}
 
-	board = $.extend(true, [], initialBoard);
+	if (!isSubTable) {
+		$cell = $ret;
+		command("");
+	}
 
-	command("");
+	return $ret;
 }
 
-function pSet(x, y, v) {
+function pSet(x, y, v, $c) {
 	if (typeof x == "object") {
 		v = y, y = x.y, x = x.x;
 	}
+	if ($c == null) $c = $cell;
 
-	if (v) $cell[y][x].addClass("filled");
-	else $cell[y][x].removeClass("filled");
+	if (v) $c[y][x].addClass("filled");
+	else $c[y][x].removeClass("filled");
 }
 
 var MOD = 4294967296, MUL = 1103515245, INC = 12345;
@@ -96,7 +102,7 @@ function nextSeed(seed) {
 function load(str) {
 	var json = JSON.parse(str);
 
-	initField($("#display"), json.width, json.height);
+	$cell = initField($("#display"), json.width, json.height);
 
 	units = json.units;
 	for (var i = 0, l = units.length; i < l; ++i) {
@@ -105,7 +111,7 @@ function load(str) {
 		for (var j = 0, jl = unit.length; j < jl; ++j) {
 			mx = min(mx, unit[j].x);
 			Mx = max(Mx, unit[j].x);
-			My = max(my, unit[j].y);
+			my = min(my, unit[j].y);
 		}
 		var len = Mx - mx + 1;
 		marginLeft = (W - len) / 2 | 0;
@@ -144,6 +150,22 @@ function load(str) {
 	}
 	$sel_seed.unbind("change").change(function() {
 		sources = makeSource(+$(this).val());
+
+		var $ul = $("#next");
+		$ul.children().remove();
+		for (var i = 0, l = sources.length; i < l; ++i) {
+/*
+			var $tbl = $("<table>").prop("cellpadding", 0).prop("cellspacing", 0);
+			var $li = $("<li>").append($tbl);
+			var unit = units[sources[i] % units.length];
+			var minX = unit[0].x, minY, maxX, maxY;
+			for (var j = 0, jl = unit.member.length; j < jl; ++j) {
+			}
+			var $c = initField($tbl, w, h, true);
+			pSet(x, y, v, $c);
+			$ul.append($li);
+*/
+		}
 	});
 	$sel_seed.prop("selectedIndex", 0);
 	$sel_seed.change();
@@ -318,7 +340,7 @@ function command(cmd) {
 					// clear
 					var dy = [];
 					for (var y = 0; y < H; ++y) dy[y] = 0;
-					for (var y = 0; y < H; ++y) {
+					for (var y = H-1; y >= 0; --y) {
 						var f = true;
 						for (var x = 0; x < W; ++x) {
 							if (!board[y][x]) {
@@ -327,10 +349,18 @@ function command(cmd) {
 							}
 						}
 						if (f) {
-							if (y > 1) ++dy[y-1];
-							dy[y] = -10000;
+							for (var x = 0; x < W; ++x) {
+								board[0][x] = false;
+							}
+							for (var Y = y-1; Y >= 0; --Y) {
+								for (var x = 0; x < W; ++x) {
+									board[Y+1][x] = board[Y][x];
+								}
+							}
+							++y;
 						}
 					}
+/*
 					for (var y = H-1; y > 0; --y) {
 						if (dy[y] >= 0) dy[y-1] += dy[y];
 					}
@@ -344,6 +374,7 @@ function command(cmd) {
 							board[0][x] = false;
 						}
 					}
+*/
 				}
 				saveRecord(Record);
 
@@ -384,14 +415,14 @@ function moveRec(d) {
 
 $(function() {
 	initTable();
-	initField($("#display"), +$("#W").val(), +$("#H").val());
+	$cell = initField($("#display"), +$("#W").val(), +$("#H").val());
 
 	$("#btn_prev, #btn_next").css("display", "none"); //
 
 	$("#W, #H")
 		.click(function() { this.select(); })
 		.change(function() {
-			initField($("#display"), +$("#W").val(), +$("#H").val());
+			$cell = initField($("#display"), +$("#W").val(), +$("#H").val());
 		});
 
 	$(document).bind("dragenter", function(e) {
