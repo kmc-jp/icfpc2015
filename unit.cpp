@@ -117,7 +117,7 @@ set<res_p> puttable_poses(const table &b, const Unit &u) {
       puttables.insert(make_tuple(nu, dir));
     }
   }
-  return movables;
+  return puttables;
 }
 
 vector<table> next_states(const table &b, const Unit &u) {
