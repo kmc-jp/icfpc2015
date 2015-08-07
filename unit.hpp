@@ -84,6 +84,24 @@ inline Unit move_e(Unit u) {
 }
 
 bool is_movable(const table &b, const Unit &u);
+inline bool is_rotatable_c(const table &b, const Unit &u) {
+  return is_movable(b, rotate_c(u));
+}
+inline bool is_rotatable_ac(const table &b, const Unit &u) {
+  return is_movable(b, rotate_ac(u));
+}
+inline bool is_movable_sw(const table &b, const Unit &u) {
+  return is_movable(b, move_sw(u));
+}
+inline bool is_movable_se(const table &b, const Unit &u) {
+  return is_movable(b, move_se(u));
+}
+inline bool is_movable_w(const table &b, const Unit &u) {
+  return is_movable(b, move_w(u));
+}
+inline bool is_movable_e(const table &b, const Unit &u) {
+  return is_movable(b, move_e(u));
+}
 
 inline bool operator==(Unit lhs, Unit rhs) {
   sort(begin(lhs.mem),end(lhs.mem));
