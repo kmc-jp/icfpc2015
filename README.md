@@ -4,7 +4,7 @@ ICFPC2015
 Team KMC
 
 
-## inputer spec.
+## inputter spec.
 ```
 time(or -1) memory(or -1)
 phrases
@@ -33,4 +33,10 @@ pivX pivY
 
 ```
 
+## outputter spec.
+problemId
+<solution>
+-- solution -- 
+seed
+command
 
