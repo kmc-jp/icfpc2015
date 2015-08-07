@@ -120,4 +120,4 @@ table lock(table &b, const Unit &u);
 Unit centerize(int w, Unit u);
 
 using res_p = tuple<Unit, int>;
-set<res_p> movable_poses(const table &b, const Unit &u);
+set<res_p> puttable_poses(const table &b, const Unit &u);
