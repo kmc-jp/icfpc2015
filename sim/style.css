@@ -87,7 +87,7 @@ input[type=text]:hover {
 }
 
 .board tr:nth-child(even) > td > div > div > div {
-	position: absolute;
+	position: relative;
 	top: 0px; left: 26px;
 }
 .board tr:nth-child(odd) > td > div > div > div {
@@ -101,7 +101,7 @@ input[type=text]:hover {
 
 #next {
 	overflow-y: scroll;
-	height: 400px;
+	height: 600px;
 	border: 1px solid rgb(140, 140, 140);
 }
 #next table td > div {
@@ -113,4 +113,17 @@ input[type=text]:hover {
 }
 #next ul {
 	list-style: none;
+}
+
+#finish > span:nth-child(2) {
+	color: red;
+}
+#finish > span {
+	font-size: 13px;
+}
+#finish {
+	display: inline-block;
+	width: 500px;
+	text-wrap: unrestricted;
+	word-wrap: break-word;
 }
