@@ -4,9 +4,16 @@ ICFPC2015
 Team KMC
 
 
-
+## inputer spec.
+```
+time(or -1) memory(or -1)
+phrases
+phrases1(include space)
+phrases2
+...
+problemId
 H W
-SeedNum seeds...
+seednums seednum1 seednum2...
 UnitNum
 <unit>
 id
@@ -23,3 +30,7 @@ MemberNum
 memberX memberY
 ...
 pivX pivY
+
+```
+
+
