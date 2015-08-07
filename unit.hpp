@@ -120,7 +120,6 @@ table erase(table &b);
 
 Unit centerize(int w, Unit u);
 
-using res_p = tuple<Unit, int>;
-set<res_p> puttable_poses(const table &b, const Unit &u);
+set<Unit> puttable_poses(const table &b, const Unit &u);
 
 vector<table> next_states(const table &b, const Unit &u);
