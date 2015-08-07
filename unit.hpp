@@ -71,4 +71,4 @@ inline Unit move_e(Unit u) {
   return u;
 }
 
-bool is_valid(const table<bool> &b, const Unit &u);
+bool is_movable(const table<bool> &b, const Unit &u);
