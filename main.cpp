@@ -9,7 +9,7 @@ uint32_t get_num(uint32_t val) {
   return val >> 16;
 }
 
-string solve(int seed, table<bool> board, vector<Unit> units, int length) {
+string solve(int seed, table board, vector<Unit> units, int length) {
   vector<int> unit_nums;
   REP(i,length) {
     unit_nums.push_back(get_num(seed)%units.size());
@@ -52,7 +52,7 @@ int main() {
     u.pivot = convert(P(px,py));
     units[i] = u;
   }
-  table<bool> b(h, line<bool>(w, false));
+  table b(h, line(w, false));
   REP(i,h){
     string l;
     cin>>l;

@@ -7,5 +7,8 @@ solver: $(OBJS)
 .cpp.o:
 	g++ $(CXXFLAGS) -c $<
 
+clean:
+	rm solver *.o
+
 main.cpp: def.hpp unit.hpp
 unit.cpp: def.hpp unit.hpp

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -6,7 +7,5 @@
 
 using namespace std;
 
-template<typename T>
-using line = vector<T>;
-template<typename T>
-using table = vector<line<T>>;
+using line = vector<bool>;
+using table = vector<line>;

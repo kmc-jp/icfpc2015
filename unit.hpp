@@ -28,6 +28,18 @@ inline P convert_back(P p) {
   return P(p.x+p.y/2, p.y);
 }
 
+inline bool operator<(P lhs, P rhs) {
+  return (lhs.x == rhs.x) ? (lhs.y < rhs.y) : lhs.x < rhs.x;
+}
+
+inline bool operator==(P lhs, P rhs) {
+  return lhs.x == rhs.x && lhs.y == rhs.y;
+}
+
+inline bool operator!=(P lhs, P rhs) {
+  return !(lhs == rhs);
+}
+
 struct Unit {
   vector<P> mem;
   P pivot;
@@ -71,4 +83,30 @@ inline Unit move_e(Unit u) {
   return u;
 }
 
-bool is_movable(const table<bool> &b, const Unit &u);
+bool is_movable(const table &b, const Unit &u);
+inline bool is_rotatable_c(const table &b, const Unit &u) {
+  return is_movable(b, rotate_c(u));
+}
+inline bool is_rotatable_ac(const table &b, const Unit &u) {
+  return is_movable(b, rotate_ac(u));
+}
+inline bool is_movable_sw(const table &b, const Unit &u) {
+  return is_movable(b, move_sw(u));
+}
+inline bool is_movable_se(const table &b, const Unit &u) {
+  return is_movable(b, move_se(u));
+}
+inline bool is_movable_w(const table &b, const Unit &u) {
+  return is_movable(b, move_w(u));
+}
+inline bool is_movable_e(const table &b, const Unit &u) {
+  return is_movable(b, move_e(u));
+}
+
+inline bool operator==(Unit lhs, Unit rhs) {
+  sort(begin(lhs.mem),end(lhs.mem));
+  sort(begin(rhs.mem),end(rhs.mem));
+  return lhs.mem == rhs.mem && lhs.pivot == rhs.pivot;
+}
+
+table lock(table &b, const Unit &u);
