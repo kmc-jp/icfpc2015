@@ -87,6 +87,7 @@ set<res_p> puttable_poses(const table &b, const Unit &u) {
     Unit nu;
     int dir;
     tie(nu, dir) = q.front();
+    q.pop();
     bool puttable = false;
     if (is_rotatable_c(b, nu)) {
       update(movables, q, rotate_c(nu), (dir + 1) % 6);
