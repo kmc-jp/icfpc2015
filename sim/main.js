@@ -1,14 +1,16 @@
 var W, H;
 
 var units; // = [{ pivot: ..., member: [{x: y:}] }]
-var sources;
-var board = [];
+var sources = [[]];
+var sourceLength;
+
+var board = [], initialBoard = [];
 var $cell = [];
 
 var key = [];
 
 var nowUnit;
-var unitId, seedId;
+var unitId;
 
 var Tbl = [
 	{ key: "p'!.03", val: "W" },
@@ -19,7 +21,6 @@ var Tbl = [
 	{ key: "kstuwx", val: "CCW" }
 ];
 var tbl = {};
-//eeeeeeeeeeee                    a      aaae aaaa eaaaaa eaaa!aa  e ee      aa!eeeeeeeeaa   a!!aaaae
 var Record = [];
 
 function min(a, b) { return a > b ? b : a; }
@@ -30,6 +31,15 @@ function initField($display, w, h) {
 
 	$("#W").val(W);
 	$("#H").val(H);
+
+	board = [];
+	for (var y = 0; y < H; ++y) {
+		board[y] = [];
+		for (var x = 0; x < W; ++x) {
+			board[y][x] = false;
+		}
+	}
+	initialBoard = $.extend(true, [], board);
 
 	var $tbody = $("tbody", $display);
 	if ($tbody.length == 0) {
@@ -49,7 +59,9 @@ function initField($display, w, h) {
 			var $td = $("<td>").append(
 				$("<div>").append(
 					$("<div>").append(
-						$("<div>").text(Format("({0}, {1})", x, y))
+						$("<div>").text(Format("({0}, {1})", x, y)).append(
+							$("<div>")
+						)
 					)
 				)
 			);
@@ -60,13 +72,9 @@ function initField($display, w, h) {
 		$tbody.append($tr);
 	}
 
-	board = [];
-	for (var y = 0; y < H; ++y) {
-		board[y] = [];
-		for (var x = 0; x < W; ++x) {
-			board[y][x] = false;
-		}
-	}
+	board = $.extend(true, [], initialBoard);
+
+	command("");
 }
 
 function pSet(x, y, v) {
@@ -113,28 +121,49 @@ function load(str) {
 		}
 	}
 
+	initialBoard = [];
+	for (var y = 0; y < H; ++y) {
+		initialBoard[y] = [];
+		for (var x = 0; x < W; ++x) {
+			initialBoard[y][x] = false;
+		}
+	}
 	for (var i = 0, l = json.filled.length; i < l; ++i) {
+		initialBoard[json.filled[i].y][json.filled[i].x] = true;
 		pSet(json.filled[i], 1);
 	}
 
-	sources = [];
-	for (var i = 0, l = json.sourceSeeds.length; i < l; ++i) {
-		sources[i] = [];
+	sourceLength = json.sourceLength;
 
-		var seed = json.sourceSeeds[i];
-		for (var j = 0, jl = json.sourceLength; j < jl; ++j) {
-			sources[i][j] = (seed / 65536 | 0) & 32767;
-			seed = nextSeed(seed);
-		}
-		for (var j = 0, jl = sources[i].length; j < jl; ++j) {
-			sources[i][j] %= units.length;
-		}
+	var $sel_seed = $("#seed");
+	$sel_seed.children().remove();
+	for (var i = 0, l = json.sourceSeeds.length; i < l; ++i) {
+		$sel_seed.append(
+			$("<option>").val(json.sourceSeeds[i]).text(json.sourceSeeds[i])
+		);
 	}
+	$sel_seed.unbind("change").change(function() {
+		sources = makeSource(+$(this).val());
+	});
+	$sel_seed.prop("selectedIndex", 0);
+	$sel_seed.change();
 
 	$("#command").focus();
 }
-function initGame(_seedId) {
-	seedId = _seedId;
+function makeSource(seed) {
+	var ret = [];
+
+	for (var i = 0, l = sourceLength; i < l; ++i) {
+		ret[i] = (seed / 65536 | 0) & 32767;
+		seed = nextSeed(seed);
+	}
+	for (var i = 0, l = sources.length; i < l; ++i) {
+		ret[i] %= units.length;
+	}
+	return ret;
+}
+function initGame() {
+	sources = $("#seed").children().length > 0 ? makeSource(+$("#seed").val()) : [];
 	unitId = -1;
 	nowUnit = {
 		pivot: { x: -1, y: -1 },
@@ -142,13 +171,7 @@ function initGame(_seedId) {
 	};
 	Record = [];
 
-	board = [];
-	for (var y = 0; y < H; ++y) {
-		board[y] = [];
-		for (var x = 0; x < W; ++x) {
-			board[y][x] = false;
-		}
-	}
+	board = $.extend(true, [], initialBoard);
 }
 function isValidLocation(unit) {
 	if (unit == null) unit = nowUnit;
@@ -160,9 +183,9 @@ function isValidLocation(unit) {
 	return true;
 }
 function nextUnit() {
-	if (++unitId >= sources[seedId].length) return false;
+	if (++unitId >= sources.length) return false;
 
-	nowUnit = $.extend(true, {}, units[sources[seedId][unitId]]);
+	nowUnit = $.extend(true, {}, units[sources[unitId]]);
 
 	return isValidLocation();
 }
@@ -177,9 +200,12 @@ function drawRecord($sel, rec) {
 
 	$sel.unbind("change");
 	$sel.change(function() {
+		var sidx = $sel.prop("selectedIndex");
 		for (var y = 0; y < H; ++y) {
 			for (var x = 0; x < W; ++x) {
-				pSet(x, y, rec[$sel.prop("selectedIndex")].board[y][x]);
+				pSet(x, y, rec[sidx].board[y][x]);
+				if (typeof rec[sidx].board[y][x] == "number") $cell[y][x].addClass("pivot");
+				else $cell[y][x].removeClass("pivot");
 			}
 		}
 	});
@@ -193,6 +219,11 @@ function saveRecord(rec) {
 		for (var i = 0, l = nowUnit.members.length; i < l; ++i) {
 			var x = nowUnit.members[i].x, y = nowUnit.members[i].y;
 			b[y][x] = true;
+		}
+		{
+			var x = nowUnit.pivot.x;
+			var y = nowUnit.pivot.y;
+			b[y][x] = b[y][x] ? 1 : 0;
 		}
 	}
 	rec.push({
@@ -244,86 +275,84 @@ function command(cmd) {
 
 	initGame(0);
 
-	for (var i = 0, l = cmd.length; i < l; ++i) {
-		if (nowUnit.pivot.y < 0) {
-			if ( !nextUnit() ) {
-				break;
+	var f = nextUnit();
+	saveRecord(Record);
+
+	if (f) {
+		for (var i = 0, l = cmd.length; i < l; ++i) {
+			var next;
+			if (cmd[i] == "W") {
+				next = move(-1, 0);
 			}
-			saveRecord(Record);
-		}
-
-		var next;
-		if (cmd[i] == "W") {
-			next = move(-1, 0);
-		}
-		else if (cmd[i] == "E") {
-			next = move(1, 0);
-		}
-		else if (cmd[i] == "SW") {
-			next = move({ x: -1, y: 1 }, { x: 0, y: 1 });
-		}
-		else if (cmd[i] == "SE") {
-			next = move({ x: 0, y: 1 }, { x: 1, y: 1 });
-		}
-		else if (cmd[i] == "CW") {
-			next = rotate(1);
-		}
-		else if (cmd[i] == "CCW") {
-			next = rotate(-1);
-		}
-		else {
-			console.log(cmd[i]);
-		}
-
-		if (next != null) {
-			if (isValidLocation(next)) {
-				nowUnit = next;
+			else if (cmd[i] == "E") {
+				next = move(1, 0);
+			}
+			else if (cmd[i] == "SW") {
+				next = move({ x: -1, y: 1 }, { x: 0, y: 1 });
+			}
+			else if (cmd[i] == "SE") {
+				next = move({ x: 0, y: 1 }, { x: 1, y: 1 });
+			}
+			else if (cmd[i] == "CW") {
+				next = rotate(1);
+			}
+			else if (cmd[i] == "CCW") {
+				next = rotate(-1);
 			}
 			else {
-				// locate
-				for (var j = 0, jl = nowUnit.members.length; j < jl; ++j) {
-					var x = nowUnit.members[j].x, y = nowUnit.members[j].y;
-					board[y][x] = true;
-				}
-				nowUnit.pivot.x = nowUnit.pivot.y = -1;
+				console.log(cmd[i]);
+			}
 
-				// clear
-				var dy = [];
-				for (var y = 0; y < H; ++y) dy[y] = 0;
-				for (var y = 0; y < H; ++y) {
-					var f = true;
-					for (var x = 0; x < W; ++x) {
-						if (!board[y][x]) {
-							f = false;
-							break;
+			if (next != null) {
+				if (isValidLocation(next)) {
+					nowUnit = next;
+				}
+				else {
+					// locate
+					for (var j = 0, jl = nowUnit.members.length; j < jl; ++j) {
+						var x = nowUnit.members[j].x, y = nowUnit.members[j].y;
+						board[y][x] = true;
+					}
+					nowUnit.pivot.x = nowUnit.pivot.y = -1;
+
+					// clear
+					var dy = [];
+					for (var y = 0; y < H; ++y) dy[y] = 0;
+					for (var y = 0; y < H; ++y) {
+						var f = true;
+						for (var x = 0; x < W; ++x) {
+							if (!board[y][x]) {
+								f = false;
+								break;
+							}
+						}
+						if (f) {
+							if (y > 1) ++dy[y-1];
+							dy[y] = -10000;
 						}
 					}
-					if (f) {
-						if (y > 1) ++dy[y-1];
-						dy[y] = -10000;
+					for (var y = H-1; y > 0; --y) {
+						if (dy[y] >= 0) dy[y-1] += dy[y];
 					}
-				}
-				for (var y = H-1; y > 0; --y) {
-					if (dy[y] >= 0) dy[y-1] += dy[y];
-				}
-				for (var y = H-1; y >= 0; --y) {
-					for (var x = 0; x < W; ++x) {
-						if (dy[y] >= 1) board[y+dy[y]][x] = board[y][x];
+					for (var y = H-1; y >= 0; --y) {
+						for (var x = 0; x < W; ++x) {
+							if (dy[y] >= 1) board[y+dy[y]][x] = board[y][x];
+						}
 					}
-				}
-				if (dy[0] != 0) {
-					for (var x = 0; x < W; ++x) {
-						board[0][x] = false;
+					if (dy[0] != 0) {
+						for (var x = 0; x < W; ++x) {
+							board[0][x] = false;
+						}
 					}
-				}
-			}
-			saveRecord(Record);
-
-			if (nowUnit.pivot.y < 0) {
-				if ( !nextUnit() ) {
-					break;
 				}
 				saveRecord(Record);
+
+				if (nowUnit.pivot.y < 0) {
+					if ( !nextUnit() ) {
+						break;
+					}
+					saveRecord(Record);
+				}
 			}
 		}
 	}
@@ -346,9 +375,6 @@ function initTable() {
 	}
 }
 
-function initNext() {
-}
-
 function moveRec(d) {
 	var sidx = $("#record").prop("selectedIndex");
 	if (0 <= sidx+d && sidx+d < $("#record option").length) {
@@ -359,8 +385,6 @@ function moveRec(d) {
 $(function() {
 	initTable();
 	initField($("#display"), +$("#W").val(), +$("#H").val());
-
-	initNext();
 
 	$("#btn_prev, #btn_next").css("display", "none"); //
 

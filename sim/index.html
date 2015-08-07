@@ -23,20 +23,27 @@ JavaScriptに対応したブラウザをご使用下さい。
 </head>
 <body>
 <table cellpadding=0 cellspacing=0 align="center">
-	<tr>
-		<td style="text-align: center;" colspan=4><input type="text" id="W" value="5" class="tb_WH">×<input type="text" id="H" value="10"></td>
-	</tr>
-	<tr><td colspan=4 style="text-align: center;">
-		<input type="button" id="btn_recLeft" value="<">
-		<select id="record"></select>
-		<input type="button" id="btn_recRight" value=">">
+	<tr><td colspan=4>
+		<table cellpadding=0 cellspacing=0 width=100%>
+			<td style="width: 20%;">
+				<input type="text" id="W" value="5" class="tb_WH">×<input type="text" id="H" value="10">
+			</td>
+			<td style="width: 60%; text-align: center;">
+				<input type="button" id="btn_recLeft" value="<">
+				<select id="record"></select>
+				<input type="button" id="btn_recRight" value=">">
+			</td>
+			<td style="width: 20%; text-align: right;">
+				seed: <select id="seed"></select>
+			</td>
+		</table>
 	</td></tr>
 	<tr>
 		<td colspan=3>
-			<table cellpadding="0" cellspacing="0" id="display"></table>
+			<table cellpadding="0" cellspacing="0" id="display" class="board"></table>
 		</td>
 		<td rowspan=3 style="vertical-align: top;">
-			<div id="next" style="display: none;">
+			<div id="next">
 				<ul></ul>
 			</div>
 		</td>
