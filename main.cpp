@@ -12,9 +12,9 @@ uint32_t get_num(uint32_t val) {
 void dump_board(const table &b) {
   for (auto l : b) {
     for (bool p : l) {
-      cout<<p;
+      cerr<<p;
     }
-    cout<<endl;
+    cerr<<endl;
   }
 }
 
