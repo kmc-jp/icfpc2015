@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <meta http-equiv="Content-Script-Type" content="text/javascript">
-<link rel="stylesheet" href="lib/jquery/jquery-ui-1.10.4/themes/base/jquery.ui.all.css">
+<link rel="stylesheet" type="text/css" href="lib/perfect-scrollbar.css">
 <link rel="stylesheet" type="text/css" href="lib/style.css">
 <link rel="stylesheet" type="text/css" href="lib/cuicore.css">
 <link rel="stylesheet" type="text/css" href="style.css">
@@ -14,7 +14,7 @@
 <script type="text/javascript" src="lib/jquery/jquery-2.1.0.min.js"></script>
 <script type="text/javascript" src="lib/jquery/jquery.cookie.js"></script>
 <script type="text/javascript" src="lib/jquery/jquery.mousewheel.js"></script>
-<script type="text/javascript" src="lib/jquery/jquery-ui-1.10.4/ui/minified/jquery-ui.min.js"></script>
+<script type="text/javascript" src="lib/perfect-scrollbar.js"></script>
 <script type="text/javascript" src="lib/system.js"></script>
 <script type="text/javascript" src="main.js"></script>
 <noscript>
@@ -34,6 +34,7 @@ JavaScriptに対応したブラウザをご使用下さい。
 				<input type="button" id="btn_recRight" value=">">
 			</td>
 			<td style="width: 20%; text-align: right;">
+				prob: <select id="prob"></select><BR>
 				seed: <select id="seed"></select>
 			</td>
 		</table>
@@ -50,10 +51,7 @@ JavaScriptに対応したブラウザをご使用下さい。
 	</tr>
 	<tr>
 		<td colspan=3 style="text-align: center;">
-			<form onsubmit="return false;" id="form_command">
-				<input type="text" id="command">
-				<input type="submit" id="btn_command" value="Apply">
-			</form>
+			<input type="text" id="command">
 		</td>
 	</tr>
 	<tr><td colspan=3 style="text-align: center;">
