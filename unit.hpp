@@ -83,7 +83,8 @@ inline Unit move_e(Unit u) {
   return u;
 }
 
-bool is_movable(const table<bool> &b, const Unit &u);
+bool is_movable(const table &b, const Unit &u);
+
 inline bool operator==(Unit lhs, Unit rhs) {
   sort(begin(lhs.mem),end(lhs.mem));
   sort(begin(rhs.mem),end(rhs.mem));

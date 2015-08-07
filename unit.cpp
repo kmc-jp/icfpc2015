@@ -1,7 +1,7 @@
 #include "def.hpp"
 #include "unit.hpp"
 
-bool is_movable(table<bool> b, const Unit &u) {
+bool is_movable(table b, const Unit &u) {
   int w=b[0].size(), h=b.size();
   for(P p:u.mem) {
     P b_pos = convert_back(p+u.pivot);
