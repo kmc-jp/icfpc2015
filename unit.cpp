@@ -46,85 +46,78 @@ table erase(table b) {
 Unit centerize(int w, Unit u) {
   int ymin = 1000000000;
   for (P p:u.mem) {
-    p = convert_back(p);
+    p = convert_back(p+u.pivot);
     ymin = min(ymin, p.y);
   }
   int yoff = -ymin;
-  for (P &p:u.mem) {
-    p.y += yoff;
-  }
+  u.pivot.y += yoff;
   int xmin = 1000000000;
   int xmax = -1000000000;
   for (P p:u.mem) {
-    P q = convert_back(p);
+    P q = convert_back(p+u.pivot);
     xmin = min(xmin, q.x);
     xmax = max(xmax, q.x);
   }
   int xoff = (w - (xmax - xmin)) / 2 - xmin;
-  for (P &p:u.mem) {
-    p = convert_back(p);
-    p.x += xoff;
-    p = convert(p);
-  }
+  u.pivot.x += xoff;
   return u;
 }
 
-void update(set<res_p> &s, queue<res_p> &q, const Unit &u, int dir) {
-  if (!s.count(make_tuple(u, dir))) {
-    s.insert(make_tuple(u, dir));
-    q.push(make_tuple(u, dir));
+void update(set<Unit> &s, queue<Unit> &q, const Unit &u) {
+  if (!s.count(u)) {
+    s.insert(u);
+    q.push(u);
   }
 }
 
-set<res_p> puttable_poses(const table &b, const Unit &u) {
+set<Unit> puttable_poses(const table &b, const Unit &u) {
   int w = b[0].size(), h = b.size();
   Unit init_u = centerize(w, u);
-  set<res_p> movables, puttables;
-  movables.insert(make_tuple(init_u, 0));
-  queue<res_p> q;
-  q.push(make_tuple(init_u, 0));
+  set<Unit> movables, puttables;
+  movables.insert(init_u);
+  queue<Unit> q;
+  q.push(init_u);
   while(!q.empty()) {
     Unit nu;
-    int dir;
-    tie(nu, dir) = q.front();
+    nu = q.front();
     q.pop();
     bool puttable = false;
     if (is_rotatable_c(b, nu)) {
-      update(movables, q, rotate_c(nu), (dir + 1) % 6);
+      update(movables, q, rotate_c(nu));
     } else {
       puttable = true;
     } if (is_rotatable_ac(b, nu)) {
-      update(movables, q, rotate_ac(nu), (dir + 5) % 6);
+      update(movables, q, rotate_ac(nu));
     } else {
       puttable = true;
     } if (is_movable_sw(b, nu)) {
-      update(movables, q, move_sw(nu), dir);
+      update(movables, q, move_sw(nu));
     } else {
       puttable = true;
     } if (is_movable_se(b, nu)) {
-      update(movables, q, move_se(nu), dir);
+      update(movables, q, move_se(nu));
     } else {
       puttable = true;
     } if (is_movable_w(b, nu)) {
-      update(movables, q, move_w(nu), dir);
+      update(movables, q, move_w(nu));
     } else {
       puttable = true;
     } if (is_movable_e(b, nu)) {
-      update(movables, q, move_e(nu), dir);
+      update(movables, q, move_e(nu));
     } else {
       puttable = true;
     } if (puttable) {
-      puttables.insert(make_tuple(nu, dir));
+      puttables.insert(nu);
     }
   }
   return puttables;
 }
 
 vector<table> next_states(const table &b, const Unit &u) {
-  set<res_p> movs = puttable_poses(b, u);
+  set<Unit> movs = puttable_poses(b, u);
   vector<table> nexts;
-  for (res_p p : movs) {
-    nexts.push_back(lock(b, get<0>(p)));
+  for (Unit nu : movs) {
+    nexts.push_back(erase(lock(b, nu)));
   }
   sort(begin(nexts),end(nexts));
   nexts.erase(unique(begin(nexts),end(nexts)), end(nexts));
