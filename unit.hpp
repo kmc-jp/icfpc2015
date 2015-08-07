@@ -28,6 +28,18 @@ inline P convert_back(P p) {
   return P(p.x+p.y/2, p.y);
 }
 
+inline bool operator<(P lhs, P rhs) {
+  return (lhs.x == rhs.x) ? (lhs.y < rhs.y) : lhs.x < rhs.x;
+}
+
+inline bool operator==(P lhs, P rhs) {
+  return lhs.x == rhs.x && lhs.y == rhs.y;
+}
+
+inline bool operator!=(P lhs, P rhs) {
+  return !(lhs == rhs);
+}
+
 struct Unit {
   vector<P> mem;
   P pivot;
