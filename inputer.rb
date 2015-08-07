@@ -10,7 +10,7 @@ w = j["width"]
 h = j["height"]
 board = Array.new(h){"."*w}
 bcells = j["filled"].each{|c|
-    board[h-c["y"]-1][c["x"]] = "#"
+    board[c["y"]][c["x"]] = "#"
 }
 sl = j["sourceLength"]
 ss = j["sourceSeeds"]
