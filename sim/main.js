@@ -27,9 +27,9 @@ function min(a, b) { return a > b ? b : a; }
 function max(a, b) { return a > b ? a : b; }
 
 function initField($display, w, h, isSubTable) {
-	W = w, H = h;
-
 	if (!isSubTable) {
+		W = w, H = h;
+
 		$("#W").val(W);
 		$("#H").val(H);
 
@@ -53,11 +53,11 @@ function initField($display, w, h, isSubTable) {
 	}
 
 	var $ret = [];
-	for (var y = 0; y < H; ++y) {
+	for (var y = 0; y < h; ++y) {
 		$ret[y] = [];
 
 		var $tr = $("<tr>");
-		for (var x = 0; x < W; ++x) {
+		for (var x = 0; x < w; ++x) {
 			var $td = $("<td>").append(
 				$("<div>").append(
 					$("<div>").append(
@@ -151,20 +151,29 @@ function load(str) {
 	$sel_seed.unbind("change").change(function() {
 		sources = makeSource(+$(this).val());
 
-		var $ul = $("#next");
+		var $ul = $("#next ul");
 		$ul.children().remove();
 		for (var i = 0, l = sources.length; i < l; ++i) {
-/*
-			var $tbl = $("<table>").prop("cellpadding", 0).prop("cellspacing", 0);
+			var $tbl = $("<table>").prop("cellpadding", 0).prop("cellspacing", 0).addClass("board");
 			var $li = $("<li>").append($tbl);
 			var unit = units[sources[i] % units.length];
-			var minX = unit[0].x, minY, maxX, maxY;
-			for (var j = 0, jl = unit.member.length; j < jl; ++j) {
+			var minX = unit.pivot.x, minY = unit.pivot.y, maxX = unit.pivot.x, maxY = unit.pivot.y;
+			for (var j = 0, jl = unit.members.length; j < jl; ++j) {
+				var x = unit.members[j].x, y = unit.members[j].y;
+				minX = min(minX, x);
+				maxX = max(maxX, x);
+				minY = min(minY, y);
+				maxY = max(maxY, y);
 			}
+			var w = maxX - minX + 1, h = maxY - minY + 1;
 			var $c = initField($tbl, w, h, true);
-			pSet(x, y, v, $c);
+			var dx = -minX, dy = -minY;
+			for (var j = 0, jl = unit.members.length; j < jl; ++j) {
+				var x = unit.members[j].x+dx, y = unit.members[j].y+dy;
+				pSet(x, y, true, $c);
+			}
+			$c[unit.pivot.y+dy][unit.pivot.x+dx].addClass("pivot");
 			$ul.append($li);
-*/
 		}
 	});
 	$sel_seed.prop("selectedIndex", 0);
@@ -292,15 +301,19 @@ function rotate(r) {
 	}
 	return ret;
 }
-function command(cmd) {
-	if (typeof cmd == "string") cmd = decode(cmd);
+function command(str_cmd) {
+	var cmd = decode(str_cmd);
 
 	initGame(0);
 
 	var f = nextUnit();
 	saveRecord(Record);
 
+	var lastPos = -1;
+	var isFinished = false;
+
 	if (f) {
+		lastPos = cmd.length-1;
 		for (var i = 0, l = cmd.length; i < l; ++i) {
 			var next;
 			if (cmd[i] == "W") {
@@ -380,6 +393,8 @@ function command(cmd) {
 
 				if (nowUnit.pivot.y < 0) {
 					if ( !nextUnit() ) {
+						isFinished = true;
+						lastPos = i;
 						break;
 					}
 					saveRecord(Record);
@@ -387,6 +402,13 @@ function command(cmd) {
 			}
 		}
 	}
+
+	$("#finish").children().remove();
+	$("#finish").css("display", "").append(
+		$("<span>").text(str_cmd.substr(0, lastPos+1)).css("color", (isFinished ? "blue" : "black"))
+	).append(
+		$("<span>").text(str_cmd.substr(lastPos+1, str_cmd.length))
+	);
 
 	drawRecord($("#record"), Record);
 }
