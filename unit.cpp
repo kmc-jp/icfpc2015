@@ -23,7 +23,9 @@ table lock(table b, const Unit &u) {
   return b;
 }
 
-table erase(table b) {
+tuple<table, int64_t, int64_t> erase(table b, int64_t score, int64_t ls_old,
+  int unit_size) {
+  int ls = 0;
   int w = b[0].size(), h = b.size();
   for(int i=h-1; i >= 0; --i) {
     bool filled = true;
@@ -38,9 +40,15 @@ table erase(table b) {
         b[0][j] = false;
       }
       --i;
+      ++ls;
     }
   }
-  return b;
+  int64_t point = unit_size + 100 * (1 + ls) * ls / 2;
+  score += point;
+  if (ls_old > 1) {
+    score += (ls_old - 1) * point / 10;
+  }
+  return make_tuple(b, score, ls); 
 }
 
 Unit centerize(int w, Unit u) {
@@ -113,11 +121,12 @@ set<Unit> puttable_poses(const table &b, const Unit &u) {
   return puttables;
 }
 
-vector<table> next_states(const table &b, const Unit &u) {
+vector<tuple<table, int64_t, int64_t>> next_states(const table &b,
+    const Unit &u, int64_t score, int64_t ls_old) {
   set<Unit> movs = puttable_poses(b, u);
-  vector<table> nexts;
+  vector<tuple<table, int64_t, int64_t>> nexts;
   for (Unit nu : movs) {
-    nexts.push_back(erase(lock(b, nu)));
+    nexts.push_back(erase(lock(b, nu), score, ls_old, nu.mem.size()));
   }
   sort(begin(nexts),end(nexts));
   nexts.erase(unique(begin(nexts),end(nexts)), end(nexts));

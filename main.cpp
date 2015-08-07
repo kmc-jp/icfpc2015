@@ -24,7 +24,7 @@ string solve(int seed, table board, vector<Unit> units, int length) {
     unit_nums.push_back(get_num(seed)%units.size());
     seed = rand_next(seed);
   }
-  auto nexts = next_states(board, units[unit_nums[0]]);
+  auto nexts = next_states(board, units[unit_nums[0]], 0, 0);
   return "ok";
 }
 
