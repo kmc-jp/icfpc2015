@@ -90,3 +90,5 @@ inline bool operator==(Unit lhs, Unit rhs) {
   sort(begin(rhs.mem),end(rhs.mem));
   return lhs.mem == rhs.mem && lhs.pivot == rhs.pivot;
 }
+
+table lock(table &b, const Unit &u);
