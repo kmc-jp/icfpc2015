@@ -23,6 +23,25 @@ table lock(table b, const Unit &u) {
   return b;
 }
 
+table erase(table b) {
+  int w = b[0].size(), h = b.size();
+  for(int i=h-1; i >= 0; --i) {
+    bool filled = true;
+    for (int j=0; j<w; ++j) {
+      if (!b[i][j]) filled = false;
+    }
+    if (filled) {
+      for (int j=i-1; j >= 0; --j) {
+        b[j+1] = b[j];
+      }
+      for (int j=0; j<w; ++j) {
+        b[0][j] = false;
+      }
+      --i;
+    }
+  }
+}
+
 Unit centerize(int w, Unit u) {
   int ymin = 1000000000;
   for (P p:u.mem) {

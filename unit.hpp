@@ -116,6 +116,7 @@ inline bool operator<(Unit lhs, Unit rhs) {
 }
 
 table lock(table &b, const Unit &u);
+table erase(table &b);
 
 Unit centerize(int w, Unit u);
 
