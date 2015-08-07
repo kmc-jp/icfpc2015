@@ -40,6 +40,7 @@ table erase(table b) {
       --i;
     }
   }
+  return b;
 }
 
 Unit centerize(int w, Unit u) {
@@ -122,7 +123,7 @@ vector<table> next_states(const table &b, const Unit &u) {
   set<res_p> movs = puttable_poses(b, u);
   vector<table> nexts;
   for (res_p p : movs) {
-    nexts.push(lock(b, get<0>(p)));
+    nexts.push_back(lock(b, get<0>(p)));
   }
   sort(begin(nexts),end(nexts));
   nexts.erase(unique(begin(nexts),end(nexts)), end(nexts));
