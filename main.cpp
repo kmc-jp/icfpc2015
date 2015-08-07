@@ -64,6 +64,7 @@ int main() {
   cin>>length;
   cout<<problemId<<endl;
   REP(i,n) {
+    cout << seeds[i] << endl;
     cout << solve(seeds[i], b, units, length) << endl;
   }
   return 0;
