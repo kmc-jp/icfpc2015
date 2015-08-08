@@ -35,6 +35,7 @@ pivX pivY
 
 ## outputter spec.
 problemId
+solutions
 <solution>
 -- solution -- 
 seed
