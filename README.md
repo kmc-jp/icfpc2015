@@ -3,6 +3,8 @@ ICFPC2015
 
 Team KMC
 
+## manager
+run `./manger.sh <options>`
 
 ## inputter spec.
 ```
