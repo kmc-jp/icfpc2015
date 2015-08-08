@@ -159,6 +159,7 @@ function load(str) {
 		initialBoard[y] = [];
 		for (var x = 0; x < W; ++x) {
 			initialBoard[y][x] = false;
+			pSet(x, y, false);
 		}
 	}
 	for (var i = 0, l = json.filled.length; i < l; ++i) {
@@ -206,6 +207,8 @@ function load(str) {
 	});
 	$sel_seed.prop("selectedIndex", 0);
 	$sel_seed.change();
+
+	command("");
 
 	$("#command").focus();
 }
@@ -433,10 +436,19 @@ function command(str_cmd) {
 
 	$("#finish").children().remove();
 	$("#finish").css("display", "").append(
-		$("<span>").text(str_cmd.substr(0, lastPos+1)).css("color", (isFinished ? "blue" : "black"))
+		$("<pre>").text(str_cmd.substr(0, lastPos+1)).css("color", (isFinished ? "blue" : "black"))
 	).append(
-		$("<span>").text(str_cmd.substr(lastPos+1, str_cmd.length))
+		$("<pre>").text(str_cmd.substr(lastPos+1, str_cmd.length))
 	);
+
+	var last = isFinished ? unitId : unitId+1;
+	if (0 <= last && last < $("#next li").length) {
+		$("#next").data("prev", last+1);
+		$("#next li").eq(last).css("background-color", Format("rgb({0}, {1}, {2})", 220, 245, 255));
+		$("#next").scrollTop( $("#next").scrollTop() + $("#next li").eq(last).offset().top - 60 );
+	}
+	var prevLast = $("#next").data("prev");
+	if (prevLast) $("#next li").eq(prevLast-1).css("background-color", "");
 
 	drawRecord($("#record"), Record);
 }

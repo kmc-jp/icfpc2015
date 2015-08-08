@@ -112,14 +112,16 @@ input[type=text]:hover {
     position: relative;
 }
 #next ul {
-	list-style: none;
+	list-style: decimal;
 }
 
-#finish > span:nth-child(2) {
+#finish > pre:nth-child(2) {
 	color: red;
 }
-#finish > span {
-	font-size: 13px;
+#finish > pre {
+	display: inline;
+	font-size: 14px;
+	text-decoration: underline;
 }
 #finish {
 	display: inline-block;
