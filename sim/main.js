@@ -401,7 +401,7 @@ function command(str_cmd) {
 				var reps = 0;
 				while (1) {
 					if ( c.match(spells[j]) ) {
-						c.replace(spells[j], "");
+						c = c.replace(spells[j], pell);
 						++reps;
 					}
 					else break;
