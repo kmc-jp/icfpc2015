@@ -6,8 +6,15 @@ var sourceLength;
 
 var board = [], initialBoard = [];
 var $cell = [];
+var score = [];
 
 var key = [];
+var spells = [
+	"ei!" ,
+	"ia! ia!",
+	"r'lyeh",
+	"ph'nglui mglw'nafh cthulhu r'lyeh wgah'nagl fhtagn."
+];
 
 var nowUnit;
 var unitId;
@@ -232,6 +239,7 @@ function initGame() {
 		members: []
 	};
 	Record = [];
+	score = [0, 0];
 
 	board = $.extend(true, [], initialBoard);
 }
@@ -251,6 +259,11 @@ function nextUnit() {
 
 	return isValidLocation();
 }
+function scrollNext(uid) {
+	if (0 <= uid && uid < $("#next li").length) {
+		$("#next").scrollTop( $("#next").scrollTop() + $("#next li").eq(uid).offset().top - 60 );
+	}
+}
 function drawRecord($sel, rec) {
 	$sel.children().remove();
 
@@ -268,16 +281,24 @@ function drawRecord($sel, rec) {
 				pSet(x, y, rec[sidx].board[y][x]);
 				if (typeof rec[sidx].board[y][x] == "number") $cell[y][x].addClass("pivot");
 				else $cell[y][x].removeClass("pivot");
+				scrollNext(rec[sidx].uid+1);
 			}
 		}
+		var cmd = $("#finish").data("cmd");
+		if (cmd != null) {
+			var pos = $("#record").prop("selectedIndex");
+			$("#finish pre").eq(0).text( cmd.substr(0, pos) );
+			$("#finish pre").eq(1).text( cmd.substr(pos, cmd.length-pos) );
+		}
+		$("#score").text(Format("{0}+{1}={2}", rec[sidx].score[0], rec[sidx].score[1], rec[sidx].score[0]+rec[sidx].score[1]));
 	});
 
 	$sel.prop("selectedIndex", rec.length-1);
 	$sel.change();
 }
-function saveRecord(rec) {
+function saveRecord(rec, isNoUnit) {
 	var b = $.extend(true, [], board);
-	if (nowUnit.pivot.y > -1) {
+	if (nowUnit.pivot.y > -1 && !isNoUnit) {
 		for (var i = 0, l = nowUnit.members.length; i < l; ++i) {
 			var x = nowUnit.members[i].x, y = nowUnit.members[i].y;
 			b[y][x] = true;
@@ -290,7 +311,8 @@ function saveRecord(rec) {
 	}
 	rec.push({
 		uid: unitId,
-		board: b
+		board: b,
+		score: $.extend(true, [], score)
 	});
 }
 function move(x, y) {
@@ -334,6 +356,7 @@ function rotate(r) {
 }
 function command(str_cmd) {
 	var cmd = decode(str_cmd);
+	var ls_old = 0;
 
 	initGame(0);
 
@@ -369,17 +392,31 @@ function command(str_cmd) {
 				console.log(cmd[i]);
 			}
 
+			var score1 = 0;
+			var c = str_cmd.substr(0, i+1);
+			for (var j = 0, jl = spells.length; j < jl; ++j) {
+				var reps = c.split(spells[j]).length-1;
+				if (reps > 0) {
+					var len = jl;
+					score1 += 2 * len * reps + 300;
+				}
+			}
+			score[1] = score1;
+
 			if (next != null) {
 				if (isValidLocation(next)) {
 					nowUnit = next;
 				}
 				else {
-					// locate
+					// lock
 					for (var j = 0, jl = nowUnit.members.length; j < jl; ++j) {
 						var x = nowUnit.members[j].x, y = nowUnit.members[j].y;
 						board[y][x] = true;
 					}
 					nowUnit.pivot.x = nowUnit.pivot.y = -1;
+
+					var size = nowUnit.members.length;
+					var ls = 0;
 
 					// clear
 					var dy = [];
@@ -393,6 +430,7 @@ function command(str_cmd) {
 							}
 						}
 						if (f) {
+							++ls;
 							for (var x = 0; x < W; ++x) {
 								board[0][x] = false;
 							}
@@ -404,6 +442,11 @@ function command(str_cmd) {
 							++y;
 						}
 					}
+
+					var points = size + 100 * (1 + ls) * ls / 2;
+					score[0] += points;
+					if (ls_old > 1) score[0] += (ls_old-1) * points / 10 | 0;
+					ls_old = ls;
 /*
 					for (var y = H-1; y > 0; --y) {
 						if (dy[y] >= 0) dy[y-1] += dy[y];
@@ -420,35 +463,27 @@ function command(str_cmd) {
 					}
 */
 				}
-				saveRecord(Record);
 
 				if (nowUnit.pivot.y < 0) {
 					if ( !nextUnit() ) {
 						isFinished = true;
 						lastPos = i;
+						saveRecord(Record, true);
 						break;
 					}
-					saveRecord(Record);
 				}
+				saveRecord(Record);
 			}
 		}
 	}
 
-	$("#finish").children().remove();
-	$("#finish").css("display", "").append(
-		$("<pre>").text(str_cmd.substr(0, lastPos+1)).css("color", (isFinished ? "blue" : "black"))
-	).append(
-		$("<pre>").text(str_cmd.substr(lastPos+1, str_cmd.length))
-	);
+	$("#finish").data("cmd", str_cmd.substr(0, lastPos+1));
+	$("#finish pre").eq(0).css("color", (isFinished ? "blue" : "black"));
+	$("#finish pre").eq(1).css("color", (isFinished ? "blue" : "black")).text(str_cmd.substr(0, lastPos+1));
+	$("#finish pre").eq(2).text(str_cmd.substr(lastPos+1, str_cmd.length))
 
 	var last = isFinished ? unitId : unitId+1;
-	if (0 <= last && last < $("#next li").length) {
-		$("#next").data("prev", last+1);
-		$("#next li").eq(last).css("background-color", Format("rgb({0}, {1}, {2})", 220, 245, 255));
-		$("#next").scrollTop( $("#next").scrollTop() + $("#next li").eq(last).offset().top - 60 );
-	}
-	var prevLast = $("#next").data("prev");
-	if (prevLast) $("#next li").eq(prevLast-1).css("background-color", "");
+	scrollNext(last);
 
 	drawRecord($("#record"), Record);
 }

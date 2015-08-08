@@ -115,7 +115,10 @@ input[type=text]:hover {
 	list-style: decimal;
 }
 
-#finish > pre:nth-child(2) {
+#finish > pre:nth-child(1) {
+	background-color: rgb(180, 255, 200);
+}
+#finish > pre:nth-child(3) {
 	color: red;
 }
 #finish > pre {

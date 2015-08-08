@@ -25,13 +25,14 @@ JavaScriptに対応したブラウザをご使用下さい。
 <table cellpadding=0 cellspacing=0 align="center">
 	<tr><td colspan=4>
 		<table cellpadding=0 cellspacing=0 width=100%>
-			<td style="width: 20%;">
-				<input type="text" id="H" value="5" class="tb_WH">×<input type="text" id="W" value="10">
-			</td>
-			<td style="width: 60%; text-align: center;">
+			<td style="width: 20%;" id="score">Score: 0</td>
+			<td style="width: 40%; text-align: center;">
 				<input type="button" id="btn_recLeft" value="<">
 				<select id="record"></select>
 				<input type="button" id="btn_recRight" value=">">
+			</td>
+			<td style="width: 20%;">
+				<input type="text" id="H" value="5" class="tb_WH">×<input type="text" id="W" value="10">
 			</td>
 			<td style="width: 20%; text-align: right;">
 				prob: <select id="prob"></select><BR>
@@ -55,7 +56,7 @@ JavaScriptに対応したブラウザをご使用下さい。
 		</td>
 	</tr>
 	<tr><td colspan=3 style="text-align: center;">
-		<div id="finish"></div>
+		<div id="finish"><pre></pre><pre></pre><pre></pre></div>
 	</td></tr>
 </table>
 </body>
