@@ -2,7 +2,10 @@
 require 'json'
 opt = {f:[],t:[-1],m:[-1],p:[]}
 ARGV.each_slice(2){|a|opt[a[0][1].to_sym] << a[1]} unless ARGV.nil?
-j = JSON.parse(if opt[:f].empty? then $stdin else open(opt[:f][0])end.read)
+files = if opt[:f].empty? then [$stdin]
+        else opt[:f].map{|f|open(f)} end
+js = files.map{|f| JSON.parse(f.read) }
+js.each{|j|
 units = j["units"].map{|u| u["members"].map{|c| [c["x"],c["y"]]} +
                            [[u["pivot"]["x"],u["pivot"]["y"]]]
                        }
@@ -16,7 +19,7 @@ sl = j["sourceLength"]
 ss = j["sourceSeeds"]
 
 puts <<"EOS"
-#{opt[:t][0]} #{opt[:m][0]}
+#{opt[:t][-1]} #{opt[:m][-1]}
 #{opt[:p].length}
 #{opt[:p].join("\n")}
 #{j["id"]}
@@ -27,4 +30,4 @@ puts <<"EOS"
 #{board.join("\n")}
 #{sl}
 EOS
-
+}
