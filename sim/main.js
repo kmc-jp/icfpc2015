@@ -306,7 +306,7 @@ function saveRecord(rec, isNoUnit) {
 		{
 			var x = nowUnit.pivot.x;
 			var y = nowUnit.pivot.y;
-			b[y][x] = b[y][x] ? 1 : 0;
+			if (0 <= x && x < W && 0 <= y && y < H) b[y][x] = b[y][x] ? 1 : 0;
 		}
 	}
 	rec.push({
