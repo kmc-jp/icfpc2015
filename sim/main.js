@@ -520,6 +520,26 @@ function moveRec(d) {
 	}
 }
 
+function save() {
+	var data = Format('[\{"problemId":{0}, "seed":{1}, "solution":"{2}"\}]', $("#prob").prop("selectedIndex"), $("#seed").val(), $("#command").val());
+
+	var blob = new Blob([data], {type: "text/plain"}); // バイナリデータを作ります。
+
+	var fname = Format("prob{0}_ans.json", $("#prob").prop("selectedIndex"));
+
+	// IEか他ブラウザかの判定
+	if(window.navigator.msSaveBlob) {
+	    window.navigator.msSaveBlob(blob, fname);
+	}
+	else {
+	    var a = document.createElement("a");
+	    a.href = URL.createObjectURL(blob);
+	    a.target = "_blank";
+	    a.download = fname
+	    a.click();
+	}
+}
+
 $(function() {
 	initTable();
 	$cell = initField($("#display"), +$("#W").val(), +$("#H").val());
@@ -582,6 +602,12 @@ $(function() {
 			}
 			else if (e.keyCode == 39) { // →
 				moveRec(1);
+			}
+		}
+		if (key[17]) { // CTRL
+			if (e.keyCode == 83) { // S
+				save();
+				e.preventDefault();
 			}
 		}
 	}).keyup(function(e) {
