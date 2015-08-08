@@ -110,7 +110,7 @@ function initField($display, w, h, isSubTable) {
 
 	if (!isSubTable) {
 		$cell = $ret;
-		command("");
+		command($("#command").val());
 	}
 
 	return $ret;
@@ -215,7 +215,7 @@ function load(str) {
 	$sel_seed.prop("selectedIndex", 0);
 	$sel_seed.change();
 
-	command("");
+	command($("#command").val());
 
 	$("#command").focus();
 }
@@ -226,7 +226,7 @@ function makeSource(seed) {
 		ret[i] = (seed / 65536 | 0) & 32767;
 		seed = nextSeed(seed);
 	}
-	for (var i = 0, l = sources.length; i < l; ++i) {
+	for (var i = 0, l = ret.length; i < l; ++i) {
 		ret[i] %= units.length;
 	}
 	return ret;
@@ -393,13 +393,18 @@ function command(str_cmd) {
 			}
 
 			var score1 = 0;
-			var c = str_cmd.substr(0, i+1);
 			for (var j = 0, jl = spells.length; j < jl; ++j) {
+				var c = str_cmd.substr(0, i+1);
+
+				var pell = spells[j].substr(1, spells[j].length-1);
+
 				var reps = 0;
-				for (var k = 0, kl = c.length; k < kl; ++k) {
-					if (c.substr(k, kl-k).match(new RegExp("^" + spells[j], "g")) ) {
+				while (1) {
+					if ( c.match(spells[j]) ) {
+						c.replace(spells[j], "");
 						++reps;
 					}
+					else break;
 				}
 				if (reps > 0) {
 					var len = jl;
