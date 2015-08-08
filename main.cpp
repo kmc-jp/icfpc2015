@@ -2,11 +2,11 @@
 #include "unit.hpp"
 
 uint64_t rand_next(uint64_t seed) {
-  return (seed * 1103515245 + 12345)%UINT64_C(0x100000000);
+  return (seed * 1103515245 + 12345) % UINT64_C(0x100000000);
 }
 
 uint32_t get_num(uint32_t val) {
-  return val >> 16;
+  return (val >> 16) % (1 << 15);
 }
 
 void dump_board(const table &b) {
@@ -22,17 +22,18 @@ double eval(table board, int64_t score, int64_t unit_nums) {
   double ev = score;
   int h = board.size(), w = board[0].size();
   REP(i,h) REP(j,w)
-    if (board[i][j]) ev += 1.0 * i / w;
+    if (board[i][j]) ev += 1.0 * i / h;
   return ev;
 }
 
-string solve(int seed, table board, vector<Unit> units, int length) {
+string solve(uint32_t seed, table board, vector<Unit> units, int length) {
   const static int beam_width = 10000;
   int w = board[0].size();
   vector<int> unit_nums;
   REP(i,length) {
     unit_nums.push_back(get_num(seed)%units.size());
     seed = rand_next(seed);
+    //cerr << unit_nums[i] << endl;
   }
   vector<tuple<double, table, int64_t, int64_t, string>> beams;
   beams.emplace_back(0.0, board, 0, 0, "");
