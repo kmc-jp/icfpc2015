@@ -127,6 +127,11 @@ int main() {
     u.pivot = convert(P(px,py));
     units[i] = u;
   }
+  for (int i = 0; i < (int)units.size(); ++i) {
+    for (int j = 0; j < (int)units[i].mem.size(); ++j) {
+      units[i].mem[j] -= units[i].pivot;
+    }
+  }
   table b(h, line(w, false));
   REP(i,h){
     string l;
