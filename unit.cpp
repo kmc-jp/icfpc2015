@@ -23,8 +23,8 @@ table lock(table b, const Unit &u) {
   return b;
 }
 
-tuple<table, int64_t, int64_t> erase(table b, int64_t score, int64_t ls_old,
-  int unit_size) {
+tuple<table, int64_t, int64_t, string> erase(table b, int64_t score, int64_t ls_old,
+                                     int unit_size, string com) {
   int ls = 0;
   int w = b[0].size(), h = b.size();
   for(int i=h-1; i >= 0; --i) {
@@ -48,7 +48,7 @@ tuple<table, int64_t, int64_t> erase(table b, int64_t score, int64_t ls_old,
   if (ls_old > 1) {
     score += (ls_old - 1) * point / 10;
   }
-  return make_tuple(b, score, ls); 
+  return make_tuple(b, score, ls, com);
 }
 
 Unit centerize(int w, Unit u) {
@@ -66,67 +66,79 @@ Unit centerize(int w, Unit u) {
     xmin = min(xmin, q.x);
     xmax = max(xmax, q.x);
   }
-  int xoff = (w - (xmax - xmin)) / 2 - xmin;
+  int xoff = (w - (xmax - xmin + 1)) / 2 - xmin;
   u.pivot.x += xoff;
   return u;
 }
 
-void update(set<Unit> &s, queue<Unit> &q, const Unit &u) {
+void update(set<Unit> &s, queue<pair<Unit,string>> &q, Unit u, const string &com) {
   if (!s.count(u)) {
+    sort(begin(u.mem), end(u.mem));
     s.insert(u);
-    q.push(u);
+    q.push(make_pair(u, com));
   }
 }
 
-set<Unit> puttable_poses(const table &b, const Unit &u) {
-  int w = b[0].size(), h = b.size();
+map<Unit,string> puttable_poses(const table &b, const Unit &u) {
+  int w = b[0].size();
   Unit init_u = centerize(w, u);
-  set<Unit> movables, puttables;
+  set<Unit> movables;
+  map<Unit,string> puttables;
   movables.insert(init_u);
-  queue<Unit> q;
-  q.push(init_u);
+  queue<pair<Unit,string>> q;
+  q.push(make_pair(init_u, ""));
   while(!q.empty()) {
     Unit nu;
-    nu = q.front();
+    string com;
+    tie(nu, com) = q.front();
     q.pop();
     bool puttable = false;
+    char puttable_char = '9';
     if (is_rotatable_c(b, nu)) {
-      update(movables, q, rotate_c(nu));
+      update(movables, q, rotate_c(nu), com + "d");
     } else {
+      puttable_char = 'd';
       puttable = true;
     } if (is_rotatable_ac(b, nu)) {
-      update(movables, q, rotate_ac(nu));
+      update(movables, q, rotate_ac(nu), com + "k");
     } else {
+      puttable_char = 'k';
       puttable = true;
     } if (is_movable_sw(b, nu)) {
-      update(movables, q, move_sw(nu));
+      update(movables, q, move_sw(nu), com + "a");
     } else {
+      puttable_char = 'a';
       puttable = true;
     } if (is_movable_se(b, nu)) {
-      update(movables, q, move_se(nu));
+      update(movables, q, move_se(nu), com + "l");
     } else {
+      puttable_char = 'l';
       puttable = true;
     } if (is_movable_w(b, nu)) {
-      update(movables, q, move_w(nu));
+      update(movables, q, move_w(nu), com + "p");
     } else {
+      puttable_char = 'p';
       puttable = true;
     } if (is_movable_e(b, nu)) {
-      update(movables, q, move_e(nu));
+      update(movables, q, move_e(nu), com + "b");
     } else {
+      puttable_char = 'b';
       puttable = true;
     } if (puttable) {
-      puttables.insert(nu);
+      assert (puttable_char != '9'); // assertion
+      puttables[nu] = com + puttable_char;
     }
   }
   return puttables;
 }
 
-vector<tuple<table, int64_t, int64_t>> next_states(const table &b,
+vector<tuple<table, int64_t, int64_t, string>> next_states(const table &b,
     const Unit &u, int64_t score, int64_t ls_old) {
-  set<Unit> movs = puttable_poses(b, u);
-  vector<tuple<table, int64_t, int64_t>> nexts;
-  for (Unit nu : movs) {
-    nexts.push_back(erase(lock(b, nu), score, ls_old, nu.mem.size()));
+  map<Unit,string> movs = puttable_poses(b, u);
+  vector<tuple<table, int64_t, int64_t, string>> nexts;
+  for (pair<Unit,string> nu : movs) {
+    Unit u; string com; tie(u, com) = nu;
+    nexts.push_back(erase(lock(b, u), score, ls_old, u.mem.size(), com));
   }
   sort(begin(nexts),end(nexts));
   nexts.erase(unique(begin(nexts),end(nexts)), end(nexts));

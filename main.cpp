@@ -18,14 +18,79 @@ void dump_board(const table &b) {
   }
 }
 
+double eval(table board, int64_t score, int64_t unit_nums) {
+  double ev = score;
+  int h = board.size(), w = board[0].size();
+  REP(i,h) REP(j,w)
+    if (board[i][j]) ev += 1.0 * i / w;
+  return ev;
+}
+
 string solve(int seed, table board, vector<Unit> units, int length) {
+  const static int beam_width = 10000;
+  int w = board[0].size();
   vector<int> unit_nums;
   REP(i,length) {
     unit_nums.push_back(get_num(seed)%units.size());
     seed = rand_next(seed);
   }
-  auto nexts = next_states(board, units[unit_nums[0]], 0, 0);
-  return "ok";
+  vector<tuple<double, table, int64_t, int64_t, string>> beams;
+  beams.emplace_back(0.0, board, 0, 0, "");
+
+  REP(i,length) {
+    cerr << "Step: " << i << endl;
+    vector<tuple<double, table, int64_t, int64_t, string>> next_beams;
+    for (auto tup: beams) {
+      double e; table t; int64_t s, ls; string com;
+      tie(e, t, s, ls, com) = tup;
+      auto nexts = next_states(t, units[unit_nums[i]], s, ls);
+      for (auto n: nexts) {
+        table nt; int64_t ns, nls; string ncom;
+        tie(nt, ns, nls, ncom) = n;
+        double ev = eval(nt, ns, nls);
+        if (i == length-1 || is_movable(nt, centerize(w, units[unit_nums[i+1]])))
+          next_beams.emplace_back(ev, nt, ns, nls, com + ncom);
+      }
+      //cerr << "%% " << next_beams.size() << endl;
+      if (next_beams.size() > beam_width) break;
+    }
+    cerr << "Beam Width A: " << beams.size() << endl;
+    cerr << "Beam Width B: " << next_beams.size() << endl;
+    beams = next_beams;
+    sort(beams.rbegin(), beams.rend());
+    for (int i = (int)beams.size() - 2; i >= 0; --i) {
+      if (get<1>(beams[i]) == get<1>(beams[i+1])) {
+        get<0>(beams[i+1]) = -1000000000000.0;
+        get<2>(beams[i+1]) = -1000000000000LL;
+      }
+    }
+    sort(beams.rbegin(), beams.rend());
+    //if (beams.size() > beam_width) beams.resize(beam_width);
+    /*
+    for (auto tup: beams) {
+      double e; table t; int64_t score, ls_old; string com;
+      tie(e, t, score, ls_old, com) = tup;
+      cerr << score << " " << com << endl;
+      for (auto l: t) {
+        for (auto i: l)
+          cerr << (i ? "#" : ".") << " ";
+        cerr << endl;
+      }
+      cerr << endl;
+    }
+    return "ok";
+    */
+    double e; table t; int64_t score, ls_old; string com;
+    tie(e, t, score, ls_old, com) = beams[0];
+    cerr << score << " " << com << endl;
+    for (auto l: t) {
+      for (auto i: l)
+        cerr << (i ? "#" : ".") << " ";
+      cerr << endl;
+    }
+    cerr << endl;
+  }
+  return get<4>(beams[0]);
 }
 
 int main() {
@@ -73,6 +138,7 @@ int main() {
   int length;
   cin>>length;
   cout<<problemId<<endl;
+  cout<<n<<endl;
   REP(i,n) {
     cout << seeds[i] << endl;
     cout << solve(seeds[i], b, units, length) << endl;
