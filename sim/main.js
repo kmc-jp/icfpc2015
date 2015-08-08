@@ -95,7 +95,7 @@ function initField($display, w, h, isSubTable) {
 			var $td = $("<td>").append(
 				$("<div>").append(
 					$("<div>").append(
-						$("<div>").text(Format("({0}, {1})", x, y)).append(
+						$("<div>").text(Format("{0}, {1}", x, y)).append(
 							$("<div>")
 						)
 					)
@@ -395,7 +395,12 @@ function command(str_cmd) {
 			var score1 = 0;
 			var c = str_cmd.substr(0, i+1);
 			for (var j = 0, jl = spells.length; j < jl; ++j) {
-				var reps = c.split(spells[j]).length-1;
+				var reps = 0;
+				for (var k = 0, kl = c.length; k < kl; ++k) {
+					if (c.substr(k, kl-k).match(new RegExp("^" + spells[j], "g")) ) {
+						++reps;
+					}
+				}
 				if (reps > 0) {
 					var len = jl;
 					score1 += 2 * len * reps + 300;
