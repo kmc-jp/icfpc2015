@@ -232,7 +232,7 @@ function makeSource(seed) {
 	return ret;
 }
 function initGame() {
-	sources = $("#seed").children().length > 0 ? makeSource(+$("#seed").val()) : [];
+sources = $("#seed").children().length > 0 ? makeSource(+$("#seed").val()) : [];
 	unitId = -1;
 	nowUnit = {
 		pivot: { x: -1, y: -1 },
@@ -355,6 +355,8 @@ function rotate(r) {
 	return ret;
 }
 function command(str_cmd) {
+	str_cmd = str_cmd.toLowerCase();
+
 	var cmd = decode(str_cmd);
 	var ls_old = 0;
 
@@ -521,7 +523,7 @@ function moveRec(d) {
 }
 
 function save() {
-	var data = Format('[\{"problemId":{0}, "seed":{1}, "solution":"{2}"\}]', $("#prob").prop("selectedIndex"), $("#seed").val(), $("#command").val());
+	var data = Format('[\{"problemId":{0}, "seed":{1}, "solution":"{2}"\}]', $("#prob").prop("selectedIndex"), $("#seed").val(), $("#command").val().toLowerCase());
 
 	var blob = new Blob([data], {type: "text/plain"}); // バイナリデータを作ります。
 
