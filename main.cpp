@@ -18,11 +18,25 @@ void dump_board(const table &b) {
   }
 }
 
+const int dx[2][6] = {{1, 0, -1, -1, -1, 0}, {1, 1, 0, -1, 0, 1}};
+const int dy[6] = {0, 1, 1, 0, -1, -1};
+
 double eval(table board, int64_t score, int64_t unit_nums) {
-  double ev = score;
+  double ev = score * 3;
   int h = board.size(), w = board[0].size();
-  REP(i,h) REP(j,w)
-    if (board[i][j]) ev += 1.0 * i / h;
+  REP(i,h) REP(j,w) {
+    REP(dir,6) {
+      int ni = i + dy[dir], nj = j + dx[i%2][dir];
+      if (ni < 0 || nj < 0 || ni >= h || nj >= w) continue;
+      if (board[i][j] != board[ni][nj]) {
+        if (i % 3 == 0) ev -= 0.1;
+        else ev -= 0.2;
+      }
+    }
+  }
+  REP(i,h) REP(j,w) {
+    if (board[i][j]) ev += 0.5 * i / h;
+  }
   return ev;
 }
 
@@ -48,7 +62,7 @@ string solve(uint32_t seed, table board, vector<Unit> units, int length) {
       for (auto n: nexts) {
         table nt; int64_t ns, nls; string ncom;
         tie(nt, ns, nls, ncom) = n;
-        double ev = eval(nt, ns, nls);
+        double ev = eval(nt, ns, length - i);
         if (i == length-1 || is_movable(nt, centerize(w, units[unit_nums[i+1]])))
           next_beams.emplace_back(ev, nt, ns, nls, com + ncom);
       }
@@ -57,6 +71,7 @@ string solve(uint32_t seed, table board, vector<Unit> units, int length) {
     }
     cerr << "Beam Width A: " << beams.size() << endl;
     cerr << "Beam Width B: " << next_beams.size() << endl;
+    if (next_beams.empty()) break;
     beams = next_beams;
     sort(beams.rbegin(), beams.rend());
     for (int i = (int)beams.size() - 2; i >= 0; --i) {
@@ -66,7 +81,7 @@ string solve(uint32_t seed, table board, vector<Unit> units, int length) {
       }
     }
     sort(beams.rbegin(), beams.rend());
-    //if (beams.size() > beam_width) beams.resize(beam_width);
+    if (beams.size() > 300 beams.resize(300);
     /*
     for (auto tup: beams) {
       double e; table t; int64_t score, ls_old; string com;
