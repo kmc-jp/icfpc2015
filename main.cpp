@@ -42,7 +42,11 @@ double eval(table board, int64_t score, int64_t unit_nums) {
   return ev;
 }
 
-string solve(uint32_t seed, const table &board, const vector<Unit> &units, const int length, const int beam_width) {
+using state_t = tuple<double, table, int64_t, int64_t, string>;
+mutex mtx;
+
+string solve(uint32_t seed, const table &board, const vector<Unit> &units,
+    const int length, const int beam_width, const int cores) {
   int w = board[0].size();
   vector<int> unit_nums;
   REP(i,length) {
@@ -50,27 +54,38 @@ string solve(uint32_t seed, const table &board, const vector<Unit> &units, const
     seed = rand_next(seed);
     //cerr << unit_nums[i] << endl;
   }
-  vector<tuple<double, table, int64_t, int64_t, string>> beams;
+  vector<state_t> beams;
   beams.emplace_back(0.0, board, 0, 0, "");
 
   REP(i,length) {
     cerr << "Step: " << i << endl;
-    vector<tuple<double, table, int64_t, int64_t, string>> next_beams;
-    for (auto tup: beams) {
-      double e; table t; int64_t s, ls; string com;
-      tie(e, t, s, ls, com) = tup;
-      auto nexts = next_states(t, units[unit_nums[i]], s, ls);
-      for (auto n: nexts) {
-        table nt; int64_t ns, nls; string ncom;
-        tie(nt, ns, nls, ncom) = n;
-        double ev = eval(nt, ns, length - i);
-        if (i == length-1 || is_movable(nt, centerize(w, units[unit_nums[i+1]])))
-          next_beams.emplace_back(ev, nt, ns, nls, com + ncom);
-        if ((int)next_beams.size() > beam_width) break;
-      }
-      //cerr << "%% " << next_beams.size() << endl;
-      if ((int)next_beams.size() > beam_width) break;
+    vector<state_t> next_beams;
+    vector<thread> ths;
+    REP(j,cores) {
+      ths.emplace_back([=](const vector<state_t> &b,
+          vector<state_t> &nb){
+        for(int k=j; k<(int)b.size(); k+=cores) {
+          auto tup = b[k];
+          double e; table t; int64_t s, ls; string com;
+          tie(e, t, s, ls, com) = tup;
+          auto nexts = next_states(t, units[unit_nums[i]], s, ls);
+          for (auto n: nexts) {
+          table nt; int64_t ns, nls; string ncom;
+          tie(nt, ns, nls, ncom) = n;
+          double ev = eval(nt, ns, length - i);
+          if (i == length-1 || is_movable(nt, centerize(w, units[unit_nums[i+1]]))) {
+            mtx.lock();
+            nb.emplace_back(ev, nt, ns, nls, com + ncom);
+            mtx.unlock();
+          }
+          if ((int)nb.size() > beam_width) break;
+          }
+          //cerr << "%% " << next_beams.size() << endl;
+          if ((int)nb.size() > beam_width) break;
+        }
+      }, cref(beams), ref(next_beams));
     }
+    REP(j,cores) ths[j].join();
     cerr << "Beam Width A: " << beams.size() << endl;
     cerr << "Beam Width B: " << next_beams.size() << endl;
     if (next_beams.empty()) break;
@@ -166,7 +181,7 @@ int main() {
   REP(i,n) {
     cerr << "BeamWidth: " << beam_width << endl;
     cout << seeds[i] << endl;
-    cout << solve(seeds[i], b, units, length, beam_width) << endl;
+    cout << solve(seeds[i], b, units, length, beam_width, cores) << endl;
   }
   return 0;
 }

@@ -172,7 +172,7 @@ inline bool operator<(Unit lhs, Unit rhs) {
   return (lhs.mem == rhs.mem) ? lhs.pivot < rhs.pivot : lhs.mem < rhs.mem;
 }
 
-table lock(table &b, const Unit &u);
+table lock_u(table &b, const Unit &u);
 table erase(table &b);
 
 Unit centerize(int w, Unit u);

@@ -15,7 +15,7 @@ bool is_movable(const table &b, const Unit &u) {
   return true;
 }
 
-table lock(table b, const Unit &u) {
+table lock_u(table b, const Unit &u) {
   for(P p:u.mem) {
     P b_pos = convert_back(p+u.pivot);
     b[b_pos.y][b_pos.x] = true;
@@ -150,7 +150,7 @@ vector<tuple<table, int64_t, int64_t, string>> next_states(const table &b,
   vector<tuple<table, int64_t, int64_t, string>> nexts;
   for (pair<Unit,string> nu : movs) {
     Unit u; string com; tie(u, com) = nu;
-    nexts.push_back(erase(lock(b, u), score, ls_old, u.mem.size(), com));
+    nexts.push_back(erase(lock_u(b, u), score, ls_old, u.mem.size(), com));
   }
   sort(begin(nexts),end(nexts));
   nexts.erase(unique(begin(nexts),end(nexts)), end(nexts));
