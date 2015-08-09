@@ -50,6 +50,11 @@ inline P rotate(P p) {
   return res;
 }
 
+inline P rotate_c(P p) {
+  P res(p.x+p.y, -p.x);
+  return res;
+}
+
 inline Unit rotate_c(Unit u) {
   for(P &p:u.mem) {
     p = rotate(p);
@@ -58,7 +63,9 @@ inline Unit rotate_c(Unit u) {
 }
 
 inline Unit rotate_ac(Unit u) {
-  REP(i,5) u = rotate_c(u);
+  for(P &p:u.mem) {
+    p = rotate_c(p);
+  }
   return u;
 }
 
@@ -83,6 +90,12 @@ inline Unit move_e(Unit u) {
   return u;
 }
 
+inline Unit move_ei(Unit u, int dx, int dy) {
+  u.pivot.x += dx;
+  u.pivot.y += dy;
+  return u;
+}
+
 bool is_movable(const table &b, const Unit &u);
 inline bool is_rotatable_c(const table &b, const Unit &u) {
   return is_movable(b, rotate_c(u));
@@ -101,6 +114,49 @@ inline bool is_movable_w(const table &b, const Unit &u) {
 }
 inline bool is_movable_e(const table &b, const Unit &u) {
   return is_movable(b, move_e(u));
+}
+inline bool is_movable_ei(const table &b, const Unit &u) {
+  return is_movable(b, move_ei(u, 0, 1)) &&
+    is_movable(b, move_ei(u, 1, 1)) &&
+    is_movable(b, move_ei(u, 0, 2)) &&
+    is_movable(b, move_ei(u, -1, 2)) &&
+    is_movable(b, move_ei(u, -1, 3));
+}
+inline bool is_movable_eiei(const table &b, const Unit &u) {
+  return is_movable(b, move_ei(u, 0, 1)) &&
+    is_movable(b, move_ei(u, 1, 1)) &&
+    is_movable(b, move_ei(u, 0, 2)) &&
+    is_movable(b, move_ei(u, -1, 2)) &&
+    is_movable(b, move_ei(u, -1, 3)) &&
+    is_movable(b, move_ei(u, 0, 3)) &&
+    is_movable(b, move_ei(u, -1, 4)) &&
+    is_movable(b, move_ei(u, -2, 4)) &&
+    is_movable(b, move_ei(u, -2, 5));
+}
+inline bool is_movable_eieiei(const table &b, const Unit &u) {
+  return is_movable(b, move_ei(u, 0, 1)) &&
+    is_movable(b, move_ei(u, 1, 1)) &&
+    is_movable(b, move_ei(u, 0, 2)) &&
+    is_movable(b, move_ei(u, -1, 2)) &&
+    is_movable(b, move_ei(u, -1, 3)) &&
+    is_movable(b, move_ei(u, 0, 3)) &&
+    is_movable(b, move_ei(u, -1, 4)) &&
+    is_movable(b, move_ei(u, -2, 4)) &&
+    is_movable(b, move_ei(u, -2, 5)) &&
+    is_movable(b, move_ei(u, -1, 5)) &&
+    is_movable(b, move_ei(u, -2, 6)) &&
+    is_movable(b, move_ei(u, -3, 6)) &&
+    is_movable(b, move_ei(u, -3, 7));
+}
+inline bool is_movable_iaia(const table &b, const Unit &u) {
+  return is_movable(b, move_ei(u, -1, 1)) &&
+    is_movable(b, move_ei(u, -2, 2)) &&
+    is_movable(b, move_ei(u, -3, 2)) &&
+    is_movable(b, move_ei(u, -3, 3)) &&
+    is_movable(b, move_ei(u, -4, 4)) &&
+    is_movable(b, move_ei(u, -5, 5)) &&
+    is_movable(b, move_ei(u, -6, 5)) &&
+    is_movable(b, move_ei(u, -6, 6));
 }
 
 inline bool operator==(Unit lhs, Unit rhs) {

@@ -94,6 +94,18 @@ map<Unit,string> puttable_poses(const table &b, const Unit &u) {
     q.pop();
     bool puttable = false;
     char puttable_char = '9';
+    if (is_movable_eieiei(b, nu)) {
+      update(movables, q, move_ei(nu, -3, 7), com + "5ei!5ei!5ei!5");
+    }
+    if (is_movable_eiei(b, nu)) {
+      update(movables, q, move_ei(nu, -2, 5), com + "5ei!5ei!5");
+    }
+    if (is_movable_ei(b, nu)) {
+      update(movables, q, move_ei(nu, -1, 3), com + "5ei!5");
+    }
+    if (is_movable_iaia(b, nu)) {
+      update(movables, q, move_ei(nu, -6, 6), com + "ia! ia!5");
+    }
     if (is_rotatable_c(b, nu)) {
       update(movables, q, rotate_c(nu), com + "d");
     } else {
