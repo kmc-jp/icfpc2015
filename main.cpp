@@ -43,9 +43,12 @@ double eval(table board, int64_t score, int64_t unit_nums) {
 }
 
 using state_t = tuple<double, table, int64_t, int64_t, string>;
-mutex mtx;
 bool operator<(const state_t &lhs, const state_t &rhs) {
   return get<0>(lhs) < get<0>(rhs);
+}
+
+bool operator>(const state_t &lhs, const state_t &rhs) {
+  return get<0>(lhs) > get<0>(rhs);
 }
 
 string solve(uint32_t seed, const table &board, const vector<Unit> &units,
@@ -63,10 +66,10 @@ string solve(uint32_t seed, const table &board, const vector<Unit> &units,
   REP(i,length) {
     cerr << "Step: " << i << endl;
     vector<state_t> next_beams;
-    vector<thread> ths;
+    vector<future<vector<state_t>>> vec_f;
     REP(j,cores) {
-      ths.emplace_back([=](const vector<state_t> &b,
-          vector<state_t> &nb){
+      vec_f.push_back(async(launch::async,[=](const vector<state_t> &b){
+        vector<state_t> nb;
         for(int k=j; k<(int)b.size(); k+=cores) {
           auto tup = b[k];
           double e; table t; int64_t s, ls; string com;
@@ -77,30 +80,44 @@ string solve(uint32_t seed, const table &board, const vector<Unit> &units,
           tie(nt, ns, nls, ncom) = n;
           double ev = eval(nt, ns, length - i);
           if (i == length-1 || is_movable(nt, centerize(w, units[unit_nums[i+1]]))) {
-            mtx.lock();
             nb.emplace_back(ev, nt, ns, nls, com + ncom);
-            mtx.unlock();
           }
           if ((int)nb.size() > beam_width) break;
           }
           //cerr << "%% " << next_beams.size() << endl;
           if ((int)nb.size() > beam_width) break;
         }
-      }, cref(beams), ref(next_beams));
+        sort(nb.begin(), nb.end(), greater<state_t>());
+        for (int i = (int)nb.size() - 2; i >= 0; --i) {
+          if (get<1>(nb[i]) == get<1>(nb[i+1])) {
+            get<0>(nb[i+1]) = -1000000000000.0;
+            get<2>(nb[i+1]) = -1000000000000LL;
+          }
+        }
+        partial_sort(nb.begin(), nb.begin()+min(3000, (int)nb.size()), nb.end(), greater<state_t>());
+        if (nb.size() > 3000) nb.resize(3000);
+        return nb;
+      }, cref(beams)));
     }
-    REP(j,cores) ths[j].join();
+    int nb_size = 0;
+    REP(j,cores) {
+      auto res = vec_f[j].get();
+      nb_size += res.size();
+      vector<state_t> tmp(next_beams.size() + res.size());
+      merge(next_beams.begin(), next_beams.end(), res.begin(), res.end(), tmp.begin(), greater<state_t>());
+      swap(tmp, next_beams);
+    }
     cerr << "Beam Width A: " << beams.size() << endl;
-    cerr << "Beam Width B: " << next_beams.size() << endl;
+    cerr << "Beam Width B: " << nb_size << endl;
     if (next_beams.empty()) break;
     beams = next_beams;
-    sort(beams.rbegin(), beams.rend());
     for (int i = (int)beams.size() - 2; i >= 0; --i) {
       if (get<1>(beams[i]) == get<1>(beams[i+1])) {
         get<0>(beams[i+1]) = -1000000000000.0;
         get<2>(beams[i+1]) = -1000000000000LL;
       }
     }
-    partial_sort(beams.rbegin(), beams.rbegin()+min(3000, (int)beams.size()), beams.rend());
+    partial_sort(beams.begin(), beams.begin()+min(3000, (int)beams.size()), beams.end(), greater<state_t>());
     if (beams.size() > 3000) beams.resize(3000);
     /*
     for (auto tup: beams) {
