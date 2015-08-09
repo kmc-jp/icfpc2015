@@ -1,6 +1,6 @@
 #!/bin/env ruby
 require 'json'
-opt = {f:[],t:[-1],m:[-1],p:[]}
+opt = {f:[],t:[-1],m:[-1],c:[1],p:[]}
 opt.default = []
 ARGV.each_slice(2){|a|opt[a[0][1].to_sym] << a[1]} unless ARGV.nil?
 files = if opt[:f].empty? then [$stdin]
@@ -20,7 +20,7 @@ sl = j["sourceLength"]
 ss = j["sourceSeeds"]
 
 puts <<"EOS"
-#{opt[:t][-1]} #{opt[:m][-1]}
+#{opt[:t][-1]} #{opt[:m][-1]} #{opt[:c][-1]}
 #{opt[:p].length}
 #{opt[:p].join("\n")}
 #{j["id"]}

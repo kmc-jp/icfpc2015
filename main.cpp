@@ -112,8 +112,8 @@ string solve(uint32_t seed, const table &board, const vector<Unit> &units, const
 }
 
 int main() {
-  int time, mem;
-  cin>>time>>mem;
+  int time, mem, cores;
+  cin>>time>>mem>>cores;
   int ph;
   cin>>ph;
   vector<string> phs(ph);
