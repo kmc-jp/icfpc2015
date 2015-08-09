@@ -444,13 +444,13 @@ function command(str_cmd) {
 						}
 						if (f) {
 							++ls;
-							for (var x = 0; x < W; ++x) {
-								board[0][x] = false;
-							}
 							for (var Y = y-1; Y >= 0; --Y) {
 								for (var x = 0; x < W; ++x) {
 									board[Y+1][x] = board[Y][x];
 								}
+							}
+							for (var x = 0; x < W; ++x) {
+								board[0][x] = false;
 							}
 							++y;
 						}
