@@ -104,7 +104,7 @@ map<Unit,string> puttable_poses(const table &b, const Unit &u) {
       update(movables, q, move_ei(nu, -1, 3), com + "5ei!5");
     }
     if (is_movable_iaia(b, nu)) {
-      update(movables, q, move_ei(nu, -6, 6), com + "ia! ia!5");
+      update(movables, q, move_ei(nu, -6, 6), com + "ia! ia! ");
     }
     if (is_rotatable_c(b, nu)) {
       update(movables, q, rotate_c(nu), com + "d");
