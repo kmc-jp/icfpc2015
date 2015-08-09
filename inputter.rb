@@ -1,6 +1,7 @@
 #!/bin/env ruby
 require 'json'
 opt = {f:[],t:[-1],m:[-1],p:[]}
+opt.default = []
 ARGV.each_slice(2){|a|opt[a[0][1].to_sym] << a[1]} unless ARGV.nil?
 files = if opt[:f].empty? then [$stdin]
         else opt[:f].map{|f|open(f)} end
