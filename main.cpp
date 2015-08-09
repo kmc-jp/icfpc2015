@@ -137,10 +137,13 @@ string solve(uint32_t seed, const table &board, const vector<Unit> &units,
     double e; table t; int64_t score, ls_old; string com;
     tie(e, t, score, ls_old, com) = beams[0];
     cerr << score << " " << com << endl;
+    bool odd = false;
     for (auto l: t) {
+      if (odd) cerr << ' ';
       for (auto i: l)
         cerr << (i ? "#" : ".") << " ";
       cerr << endl;
+      odd = !odd;
     }
     cerr << endl;
   }
