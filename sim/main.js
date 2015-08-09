@@ -13,7 +13,9 @@ var spells = [
 	"ei!" ,
 	"ia! ia!",
 	"r'lyeh",
-	"ph'nglui mglw'nafh cthulhu r'lyeh wgah'nagl fhtagn."
+	"ph'nglui mglw'nafh cthulhu r'lyeh wgah'nagl fhtagn.",
+  "cthulhu fhtagn!",
+  "yogsothoth"
 ];
 
 var nowUnit;
