@@ -50,6 +50,11 @@ inline P rotate(P p) {
   return res;
 }
 
+inline P rotate_c(P p) {
+  P res(p.x+p.y, -p.x);
+  return res;
+}
+
 inline Unit rotate_c(Unit u) {
   for(P &p:u.mem) {
     p = rotate(p);
@@ -58,7 +63,9 @@ inline Unit rotate_c(Unit u) {
 }
 
 inline Unit rotate_ac(Unit u) {
-  REP(i,5) u = rotate_c(u);
+  for(P &p:u.mem) {
+    p = rotate_c(p);
+  }
   return u;
 }
 

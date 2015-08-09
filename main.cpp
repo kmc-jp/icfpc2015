@@ -22,8 +22,10 @@ const int dx[2][6] = {{1, 0, -1, -1, -1, 0}, {1, 1, 0, -1, 0, 1}};
 const int dy[6] = {0, 1, 1, 0, -1, -1};
 
 double eval(table board, int64_t score, int64_t unit_nums) {
-  double ev = score * 3;
   int h = board.size(), w = board[0].size();
+  double ev = score * 3;
+  if (unit_nums < w * 2) score *= 10;
+  if (unit_nums < w / 2) score *= 10;
   REP(i,h) REP(j,w) {
     REP(dir,6) {
       int ni = i + dy[dir], nj = j + dx[i%2][dir];
@@ -160,7 +162,7 @@ int main() {
   cin>>length;
   cout<<problemId<<endl;
   cout<<n<<endl;
-  int beam_width = min(100000, max(100000000 / n / h / w / length, 50));
+  int beam_width = min(100000, max(100000000 / n / h / w / length, 500));
   REP(i,n) {
     cerr << "BeamWidth: " << beam_width << endl;
     cout << seeds[i] << endl;
