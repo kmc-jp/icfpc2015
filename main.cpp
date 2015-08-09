@@ -53,6 +53,7 @@ bool operator>(const state_t &lhs, const state_t &rhs) {
 
 string solve(uint32_t seed, const table &board, const vector<Unit> &units,
     const int length, const int beam_width, const int cores) {
+  const int nb_max_size = 600;
   int w = board[0].size();
   vector<int> unit_nums;
   REP(i,length) {
@@ -94,8 +95,8 @@ string solve(uint32_t seed, const table &board, const vector<Unit> &units,
             get<2>(nb[i+1]) = -1000000000000LL;
           }
         }
-        partial_sort(nb.begin(), nb.begin()+min(3000, (int)nb.size()), nb.end(), greater<state_t>());
-        if (nb.size() > 3000) nb.resize(3000);
+        partial_sort(nb.begin(), nb.begin()+min(nb_max_size, (int)nb.size()), nb.end(), greater<state_t>());
+        if (nb.size() > nb_max_size) nb.resize(nb_max_size);
         return nb;
       }, cref(beams)));
     }
@@ -117,8 +118,8 @@ string solve(uint32_t seed, const table &board, const vector<Unit> &units,
         get<2>(beams[i+1]) = -1000000000000LL;
       }
     }
-    partial_sort(beams.begin(), beams.begin()+min(3000, (int)beams.size()), beams.end(), greater<state_t>());
-    if (beams.size() > 3000) beams.resize(3000);
+    partial_sort(beams.begin(), beams.begin()+min(nb_max_size, (int)beams.size()), beams.end(), greater<state_t>());
+    if (beams.size() > nb_max_size) beams.resize(nb_max_size);
     /*
     for (auto tup: beams) {
       double e; table t; int64_t score, ls_old; string com;
@@ -136,10 +137,13 @@ string solve(uint32_t seed, const table &board, const vector<Unit> &units,
     double e; table t; int64_t score, ls_old; string com;
     tie(e, t, score, ls_old, com) = beams[0];
     cerr << score << " " << com << endl;
+    bool odd = false;
     for (auto l: t) {
+      if (odd) cerr << ' ';
       for (auto i: l)
         cerr << (i ? "#" : ".") << " ";
       cerr << endl;
+      odd = !odd;
     }
     cerr << endl;
   }
@@ -197,7 +201,7 @@ int main() {
   cin>>length;
   cout<<problemId<<endl;
   cout<<n<<endl;
-  int beam_width = min(1000000, max(1000000000 / n / h / w / length, 5000));
+  int beam_width = min(200000, max(200000000 / n / h / w / length, 1000));
   REP(i,n) {
     cerr << "BeamWidth: " << beam_width << endl;
     cout << seeds[i] << endl;
