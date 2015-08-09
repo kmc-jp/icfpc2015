@@ -40,8 +40,7 @@ double eval(table board, int64_t score, int64_t unit_nums) {
   return ev;
 }
 
-string solve(uint32_t seed, table board, vector<Unit> units, int length) {
-  const static int beam_width = 10000;
+string solve(uint32_t seed, const table &board, const vector<Unit> &units, const int length, const int beam_width) {
   int w = board[0].size();
   vector<int> unit_nums;
   REP(i,length) {
@@ -65,9 +64,10 @@ string solve(uint32_t seed, table board, vector<Unit> units, int length) {
         double ev = eval(nt, ns, length - i);
         if (i == length-1 || is_movable(nt, centerize(w, units[unit_nums[i+1]])))
           next_beams.emplace_back(ev, nt, ns, nls, com + ncom);
+        if ((int)next_beams.size() > beam_width) break;
       }
       //cerr << "%% " << next_beams.size() << endl;
-      if (next_beams.size() > beam_width) break;
+      if ((int)next_beams.size() > beam_width) break;
     }
     cerr << "Beam Width A: " << beams.size() << endl;
     cerr << "Beam Width B: " << next_beams.size() << endl;
@@ -81,7 +81,7 @@ string solve(uint32_t seed, table board, vector<Unit> units, int length) {
       }
     }
     sort(beams.rbegin(), beams.rend());
-    if (beams.size() > 300 beams.resize(300);
+    if (beams.size() > 300) beams.resize(300);
     /*
     for (auto tup: beams) {
       double e; table t; int64_t score, ls_old; string com;
@@ -160,9 +160,10 @@ int main() {
   cin>>length;
   cout<<problemId<<endl;
   cout<<n<<endl;
+  int beam_width = min(100000, max(10000000 / n / h / w, 50));
   REP(i,n) {
     cout << seeds[i] << endl;
-    cout << solve(seeds[i], b, units, length) << endl;
+    cout << solve(seeds[i], b, units, length, beam_width) << endl;
   }
   return 0;
 }
