@@ -1,5 +1,5 @@
 OBJS=main.o unit.o
-CXXFLAGS=-Wall -Wextra -O3 -std=c++11
+CXXFLAGS=-Wall -Wextra -O3 -std=c++11 -lpthread
 
 solver: $(OBJS)
 	g++ $(CXXFLAGS) -o solver $(OBJS)
