@@ -100,8 +100,8 @@ string solve(uint32_t seed, const table &board, const vector<Unit> &units,
         get<2>(beams[i+1]) = -1000000000000LL;
       }
     }
-    sort(beams.rbegin(), beams.rend());
-    if (beams.size() > 300) beams.resize(300);
+    partial_sort(beams.rbegin(), beams.rbegin()+min(3000, (int)beams.size()), beams.rend());
+    if (beams.size() > 3000) beams.resize(3000);
     /*
     for (auto tup: beams) {
       double e; table t; int64_t score, ls_old; string com;
@@ -180,7 +180,7 @@ int main() {
   cin>>length;
   cout<<problemId<<endl;
   cout<<n<<endl;
-  int beam_width = min(100000, max(100000000 / n / h / w / length, 500));
+  int beam_width = min(1000000, max(1000000000 / n / h / w / length, 5000));
   REP(i,n) {
     cerr << "BeamWidth: " << beam_width << endl;
     cout << seeds[i] << endl;
