@@ -160,8 +160,9 @@ int main() {
   cin>>length;
   cout<<problemId<<endl;
   cout<<n<<endl;
-  int beam_width = min(100000, max(10000000 / n / h / w, 50));
+  int beam_width = min(100000, max(100000000 / n / h / w / length, 50));
   REP(i,n) {
+    cerr << "BeamWidth: " << beam_width << endl;
     cout << seeds[i] << endl;
     cout << solve(seeds[i], b, units, length, beam_width) << endl;
   }
