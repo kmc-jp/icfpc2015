@@ -44,6 +44,9 @@ double eval(table board, int64_t score, int64_t unit_nums) {
 
 using state_t = tuple<double, table, int64_t, int64_t, string>;
 mutex mtx;
+bool operator<(const state_t &lhs, const state_t &rhs) {
+  return get<0>(lhs) < get<0>(rhs);
+}
 
 string solve(uint32_t seed, const table &board, const vector<Unit> &units,
     const int length, const int beam_width, const int cores) {
