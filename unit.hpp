@@ -25,6 +25,7 @@ inline P convert(P p) {
 }
 
 inline P convert_back(P p) {
+  if (p.y < 0 && p.y % 2 != 0) return P(p.x+p.y/2-1, p.y);
   return P(p.x+p.y/2, p.y);
 }
 

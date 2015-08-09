@@ -39,7 +39,7 @@ tuple<table, int64_t, int64_t, string> erase(table b, int64_t score, int64_t ls_
       for (int j=0; j<w; ++j) {
         b[0][j] = false;
       }
-      --i;
+      ++i;
       ++ls;
     }
   }
